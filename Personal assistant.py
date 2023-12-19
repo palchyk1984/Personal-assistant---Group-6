@@ -307,11 +307,8 @@ def save_contacts(address_book, filename="contacts.txt"):
             birthday_str = str(record.birthday) if record.birthday else ""
             file.write(f"{record.name.value}:{';'.join(map(str, record.phones))}:{birthday_str}\n")
 
-# Команди бота
-def main():
-    address_book = AddressBook()
-    load_contacts(address_book)  # Додайте цей рядок
-    print("Welcome to the assistant bot!")
+# Меню
+def display_help():
     print('-' * 45 + '\nMain commands:\n'
                      'hello - greeting message\n'
                      'all - show all contacts\n'
@@ -325,7 +322,16 @@ def main():
                      'add-birthday - add birthday to an existing contact\n'
                      'show-birthday - show birthday of a contact\n'
                      'birthdays - show upcoming birthdays\n'
-                     'del - delete contact\\number\n' + '-' * 45)
+                     'del - delete contact\\number\n'
+                     'help - display all comands  from menu\n' + '-' * 45)
+
+
+# Команди бота
+def main():
+    address_book = AddressBook()
+    load_contacts(address_book)  # Додайте цей рядок
+    print("Greeting you, my young padawan!")
+    display_help()
 
     while True:
         user_input = input("Enter command: ")
@@ -366,6 +372,8 @@ def main():
             print(show_birthday(args, address_book))
         elif command == "birthdays":
             show_upcoming_birthdays(address_book)
+        elif command == 'help':
+            display_help()
         else:
             print("Invalid command.")
 
