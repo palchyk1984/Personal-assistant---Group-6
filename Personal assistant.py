@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 from rich.console import Console
 from rich.table import Table
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
 
 console = Console()
 
@@ -307,6 +309,23 @@ def save_contacts(address_book, filename="contacts.txt"):
             birthday_str = str(record.birthday) if record.birthday else ""
             file.write(f"{record.name.value}:{';'.join(map(str, record.phones))}:{birthday_str}\n")
 
+def get_valid_commands():
+    address_book = AddressBook()
+    commands = [
+        "close", "exit", "hello", "add", "all", "change", "find",
+        "del", "add-phone", "remove-phone", "edit-phone", "findphone",
+        "add-birthday", "show-birthday", "birthdays", "help"
+    ]
+
+    # Add dynamically generated commands based on the address book data
+    commands += list(address_book.data.keys())
+
+    return commands
+
+def get_user_input():
+    completer = WordCompleter(get_valid_commands(), ignore_case=True)
+    return prompt("Enter command: ", completer=completer)
+
 # Меню
 def display_help():
     print('-' * 45 + '\nMain commands:\n'
@@ -333,7 +352,7 @@ def main():
     print("Greeting you, my young padawan!")
 
     while True:
-        user_input = input("Enter command: ")
+        user_input = get_user_input()
 
         # Перевірка на пустий рядок перед викликом parse_input
         if not user_input:
