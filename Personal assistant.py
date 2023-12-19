@@ -331,7 +331,6 @@ def main():
     address_book = AddressBook()
     load_contacts(address_book)  # Додайте цей рядок
     print("Greeting you, my young padawan!")
-    display_help()
     
     while True:
         user_input = input("Enter command: ")
