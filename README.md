@@ -2,8 +2,8 @@
 
 Coommands:
 
-- help - display all comands                   
-- hello - greeting message
+    - help - display all comands                   
+    - hello - greeting message
 
 Address book 
 
