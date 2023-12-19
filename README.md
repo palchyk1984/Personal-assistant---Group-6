@@ -1,1 +1,2 @@
-# Personal-assistant---Group-6
+# Personal assistant 
+Created by the beast team in the world - Group-6
