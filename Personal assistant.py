@@ -2,7 +2,9 @@ import re
 from datetime import datetime, timedelta
 from collections import defaultdict
 from rich.console import Console
+from rich.text import Text
 from rich.table import Table
+from rich.panel import Panel
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
