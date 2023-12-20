@@ -487,8 +487,9 @@ def get_valid_commands():
     address_book = AddressBook()
     commands = [
         "close", "exit", "hello", "add", "all", "change", "find",
-        "del", "add-phone", "remove-phone", "edit-phone", "findphone",
-        "add-birthday", "show-birthday", "birthdays", "help"
+        "del", "add-phone", "remove-phone", "edit-phone", "find-phone",
+        "add-birthday", "show-birthday", "birthdays", "help", "add-email",
+        "remove-email", "edit-email"
     ]
 
     # Add dynamically generated commands based on the address book data
@@ -509,26 +510,28 @@ def display_help():
                      'hello - greeting message\n'
                      'all - show all contacts\n'
                      'find - number search by name\n'
-                     'findphone - search contacts by phone number\n'
+                     'find-phone - search contacts by phone number\n'
                      'add - add new contact\\contact number\n'
                      'change - change contact number\n'
                      'add-phone - add phone number to an existing contact\n'
                      'remove-phone - remove phone number from an existing contact\n'
-                     'editphone - edit phone number for an existing contact\n'
+                     'edit-phone - edit phone number for an existing contact\n'
                      'add-email - add email to an existing contact\n'  # Додана команда
                      'remove-email - remove email from an existing contact\n'  # Додана команда
-                     'editemail - edit email for an existing contact\n'  # Додана команда
+                     'edit-email - edit email for an existing contact\n'  # Додана команда
                      'add-birthday - add birthday to an existing contact\n'
                      'show-birthday - show birthday of a contact\n'
                      'birthdays - show upcoming birthdays\n'
                      'del - delete contact\\number\n'
-                     'help - display all comands  from menu\n' + '-' * 45)
+                     'help - display all comands  from menu\n'
+                     'close/exit - save added contacts/notes and finish work\n' + '-' * 45)
 
 
 # Команди бота
 def main():
     address_book = AddressBook()
-    load_contacts(address_book)  
+    load_contacts(address_book)
+    display_help() 
     
     print("Greeting you, my young padawan!")
     
@@ -563,7 +566,7 @@ def main():
             print(remove_phone_from_contact(args, address_book))
         elif command == "edit-phone":
             print(edit_phone_for_contact(args, address_book))
-        elif command == "findphone":
+        elif command == "find-phone":
             print(find_by_phone(args, address_book))
         elif command == "add-birthday":
             print(add_birthday_to_contact(args, address_book))
@@ -575,7 +578,7 @@ def main():
             print(add_email_to_contact(args, address_book))
         elif command == "remove-email":
             print(remove_email_from_contact(args, address_book))
-        elif command == "editemail":
+        elif command == "edit-email":
             print(edit_email_for_contact(args, address_book))
         elif command == 'help':
             display_help()
