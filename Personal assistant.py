@@ -430,7 +430,9 @@ def edit_email_for_contact(args, address_book):
         raise ValueError("Give me name, old email, and new email please.")
 
 ## ADDRESS
+    
 # Add address
+    
 @input_error    
 def add_address_to_contact(args, address_book):
     if len(args) == 2:
@@ -448,6 +450,23 @@ def add_address_to_contact(args, address_book):
         raise ValueError("Give me name and new address please.")
     return ""
 
+# Edit address
+
+@input_error
+def edit_address_for_contact(args, address_book):
+    if len(args) == 3:
+        name, old_address, new_address = args
+        record = address_book.find(name)
+        if record:
+            record.edit_address(old_address, new_address)
+            return f"Address {old_address} for {name} edited to {new_address}."
+        else:
+            raise KeyError
+    else:
+        raise ValueError("Give me name, old address, and new address please.")
+
+# Edit address
+    
 @input_error
 def remove_address_from_contact(args, address_book):
     if len(args) == 2:
@@ -463,7 +482,9 @@ def remove_address_from_contact(args, address_book):
 
 
 ## HAPPY BD
+    
 #Додавання дня народження
+    
 @input_error
 def add_birthday_to_contact(args, address_book):
     if len(args) == 2:
@@ -478,6 +499,7 @@ def add_birthday_to_contact(args, address_book):
         raise ValueError("Give me name and birthday (DD.MM.YYYY) please.")
 
 # Редагування дня народження контакту
+    
 @input_error
 def edit_birthday_for_contact(args, address_book):
     if len(args) == 2:
@@ -493,6 +515,7 @@ def edit_birthday_for_contact(args, address_book):
         raise ValueError("Give me name and new birthday (DD.MM.YYYY) please.")
     
 # Показ дня народження контакту
+    
 @input_error
 def show_birthday(args, address_book):
     if len(args) == 1:
@@ -511,6 +534,7 @@ def show_birthday(args, address_book):
 days_of_week = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
 
 # Дні народження на наступному тижні
+
 def show_upcoming_birthdays(address_book):
     birthday_next_week = defaultdict(list)
     start_of_year = datetime(year=datetime.now().year, month=1, day=1)
@@ -547,6 +571,7 @@ def add_record_notebook(args, notebook):
 
 ## DATABASE
 # Збереження контактів у текстовий файл  
+
 @input_error
 def save_contacts(address_book, filename="contacts.txt"):
     with open(filename, "w") as file:
@@ -557,14 +582,17 @@ def save_contacts(address_book, filename="contacts.txt"):
             addresses_str = ';'.join(map(str, record.addresses))  # Додайте це
             file.write(f"{record.name.value}:{phones_str}:{emails_str}:{addresses_str}:{birthday_str}\n")
 
+## Baby youda
 def get_valid_commands():
     address_book = AddressBook()
     commands = [
-        "close", "exit", "hello", "add", "all", "find",
-        "del", "add-phone", "remove-phone", "edit-phone", "find-phone",
-        "add-birthday", "show-birthday", "birthdays", "help", "add-email",
-        "remove-email", "edit-email", 
-        "add-address",  "remove-address"
+        "close", "exit", "hello", "help", 
+        "add", "del",
+        "all", "find",
+        "add-phone", "remove-phone", "edit-phone", "find-phone",
+        "add-birthday", "edit-birthday", "show-birthday", "birthdays",
+        "add-email","remove-email", "edit-email", 
+        "add-address", "edit-address" ,"remove-address"
     ]
 
     # Add dynamically generated commands based on the address book data
@@ -584,19 +612,10 @@ def save_notes(notebook, filename="notebook.txt"):
             tags_str = ';'.join(map(str, noterecord.tags)) if noterecord.tags else ""
             file.write(f"{noterecord.timestamp.ts}_{noterecord.timestamp.ID}_{tags_str}_{noterecord.note}\n")
 
-# POPUP
+## POPUP
 # Меню Help
 
-# Опреділити стилі тексту
-bold_underline = "bold underline"
-yellow_text = "yellow"
-
-# Опреділити стилі тексту
-bold_underline = "bold underline"
-green_text = "green"
-white_text = "white"
-
-# Опреділити стилі тексту
+# Mune styles
 bold_underline = "bold underline"
 green_text = "bold green"
 white_text = "white"
@@ -615,7 +634,7 @@ def display_help():
         "Phone": ["add-phone - add phone number to an existing contact", "remove-phone - remove phone number from an existing contact", "edit-phone - edit phone number for an existing contact"],
         "Email": ["add-email - add email to an existing contact", "remove-email - remove email from an existing contact", "edit-email - edit email for an existing contact"],
         "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", "birthdays - show upcoming birthdays"],
-        "Address": ["add-address - add address for an existing contact"],
+        "Address": ["add-address - add address for an existing contact","edit-address - edit address for an existing contact","remove-address - remove address for an existing contact" ],
         "Notes": ["add-note - addin note", "all-notes - display all notes"],
     }
 
@@ -708,6 +727,8 @@ def main():
             print(edit_email_for_contact(args, address_book))
         elif command == "add-address":                              # Address
             print(add_address_to_contact(args, address_book))
+        elif command == "edit-address":
+            print(edit_address_for_contact(args, address_book))
         elif command == "remove-address":
             print(remove_address_from_contact(args, address_book))
         elif command == 'help':
