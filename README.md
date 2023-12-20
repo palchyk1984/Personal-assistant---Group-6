@@ -1,3 +1,4 @@
+
 # BABY YODA
 The personal assistant (MCS-Group-6)
 ```
@@ -22,6 +23,7 @@ The personal assistant (MCS-Group-6)
 The main goal of the project was to create a personal console bot - an assistant that has a functional interface and can work with text data, display them on the screen, delete/replace/search for pieces of information, and save everything in a file on the hard disk.
 
 ## How To Install?
+
 For correct work of this application before launching a code you have to install Virtual packages:
 
 ```
@@ -84,3 +86,4 @@ For correct work of this application before launching a code you have to install
 
 ## May the code be with you!
     
+
