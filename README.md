@@ -2,18 +2,18 @@
 
 For correct work of this application before launching a code you have to install Virtual packages:
 
-1. pip install virtualenv
-2. virtualenv venv
-3. source venv/bin/activate (For Linux/macOS)
+    1. pip install virtualenv
+    2. virtualenv venv
+    3. source venv/bin/activate (For Linux/macOS)
         #TBD for windows
-4. pip3 install -r requirements.txt
+    4. pip3 install -r requirements.txt
 
-Coommands:
+    Coommands:
 
     - help - display all comands                   
     - hello - greeting message
 
-Address book:
+    Address book:
 
     Search:
     - "all" - show all contacts 
@@ -35,19 +35,19 @@ Address book:
     - remove email - remove emailr from an existing contact
     - del contact - delete contact record from database
 
-Notebook
+    Notebook
 
-- all-notes - show all notes
-- notes-day - show note per day
-- notes-month - show notes per month
-- notes-year - show notes per year
-- find-ID - search note by ID
-- new-note - add new note
-- add-tag - add tag to existing note
-- edit-note - edit note description
-- delete-note - delete specific note
+    - all-notes - show all notes
+    - notes-day - show note per day
+    - notes-month - show notes per month
+    - notes-year - show notes per year
+    - find-ID - search note by ID
+    - new-note - add new note
+    - add-tag - add tag to existing note
+    - edit-note - edit note description
+    - delete-note - delete specific note
+
     
-
                  _.' :  `._
              .-.'`.  ;   .'`.-.
     __      / : ___\ ;  /___ ; \      __
