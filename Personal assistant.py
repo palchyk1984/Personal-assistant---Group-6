@@ -1,14 +1,10 @@
-# Chagelog for bot version 0.6:
-# - added functions for 
-# - - add-birthday - add birthday to an existing contact
-# - - show-birthday - show birthday of a contact
-# - - birthdays - show upcoming birthdays
-
 import re
 from datetime import datetime, timedelta
 from collections import defaultdict
 from rich.console import Console
 from rich.table import Table
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
 
 console = Console()
 
@@ -42,15 +38,18 @@ class Birthday(Field):
             raise ValueError("Birthday should be in DD.MM.YYYY format.")
         super().__init__(value)
 
+class Address(Field):
+    pass
+
 class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
         self.emails = []
+        self.addresses = []
         self.birthday = None
-        self.email = None
 
-
+    #Методи для Phone
     def add_phone(self, phone):
         new_phone = Phone(phone)
         self.phones.append(new_phone)
@@ -69,7 +68,7 @@ class Record:
         return None
 
 
-    #Додано методи для Email
+    #Методи для Email
     def add_email(self, email):
         new_email = Email(email)
         self.emails.append(new_email)
@@ -86,18 +85,38 @@ class Record:
             if str(e) == email:
                 return e
         return None
-
+    
+    #Методи для Birthday
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
+
     def edit_birthday(self, new_birthday):
         self.birthday = Birthday(new_birthday)
+
+    #Методи для Adsress
+    def add_address(self, address):
+        new_address = Address(address)
+        self.addresses.append(new_address)
+
+     #Метод remove_address
+    def remove_address(self, address):
+        self.addresses = [a for a in self.addresses if str(a) != address]
+
+    # Метод edit_address
+    def edit_address(self, old_address, new_address):
+        self.remove_address(old_address)
+        self.add_address(new_address)
+
 
     def __str__(self):
         phones_str = ', '.join(map(str, self.phones))
         emails_str = ', '.join(map(str, self.emails))
         birthday_str = str(self.birthday) if self.birthday else ""
-        return f"Contact name: {self.name}, phones: {phones_str}, emails: {emails_str}, birthday: {birthday_str}"
+        return f"Contact name: {self.name}, phones: {', '.join(map(str, self.phones))}, " \
+               f"emails: {', '.join(map(str, self.emails))}, addresses: {', '.join(map(str, self.addresses))}, " \
+               f"birthday: {self.birthday}"
+        #return f"Contact name: {self.name}, phones: {phones_str}, emails: {emails_str}, birthday: {birthday_str}"
 
 
 
@@ -110,6 +129,63 @@ class AddressBook:
 
     def find(self, name):
         return self.data.get(name)
+
+    def delete(self, name):
+        if name in self.data:
+            del self.data[name]
+
+# Notes specific Classes
+
+class Tag(Field):                   
+    def __init__(self, value):
+        if not value.isdigit() or len(value) > 10:
+            raise ValueError("Tag should be max 10 digits")
+        super().__init__(value)
+
+class Timestamp():                 
+    def __init__(self, ID = 0):
+        self.ts = datetime.now()
+        self.ID = ID
+
+    def ID(self):
+        self.ID += 1
+    
+
+    def __str__(self):
+        return f'{self.ts} ID: {self.ID}'
+
+class Note(Field):                   
+    def __init__(self, value):
+        if len(value) > 255:
+            raise ValueError("Note should be max 255 digits")
+        super().__init__(value)
+
+class NoteRecord:
+    def __init__(self, note: Note):
+        self.timestamp = Timestamp()
+        self.tags = []
+        self.note = note
+
+    def __str__(self):
+            return f"Note from: {self.timestamp}\n Text: {self.note}\n Tags: {self.tags}\n"
+    
+class NoteBook:
+    def __init__(self):
+        self.data = {}
+
+    def add_record_notebook(self, note_record):
+        self.data[note_record.timestamp] = note_record
+
+    def show_all_notes(self):
+        for note_record in self.data.values():
+            print(note_record)
+    
+    def find_note_day(self, day):
+        notes_list_day = []
+        for timesnap in self.data:
+            if timesnap.ts.day == day:
+                notes_list_day = notes_list_day.append(self.data.get(timesnap)) 
+        return notes_list_day
 
     def delete(self, name):
         if name in self.data:
@@ -129,9 +205,9 @@ def input_error(func):
         except ValueError as e:
             return str(e)
         except KeyError:
-            return "Contact not found."
+            return "Contact not found." #Traceback !
         except IndexError:
-            return "Invalid command format."
+            return "Invalid command format." #Traceback !
 
     return inner
 
@@ -141,19 +217,26 @@ def load_contacts(address_book, filename="contacts.txt"):
     try:
         with open(filename, "r") as file:
             for line in file:
-                name, phones_str, emails_str, birthday_str = line.strip().split(":")
+                print(f"Processing line: {line}")
+                name, phones_str, emails_str, addresses_str, birthday_str = line.strip().split(":")
                 phones = phones_str.split(";")
                 emails = emails_str.split(";") if emails_str else []
+                addresses = addresses_str.split(";") if addresses_str else []
                 record = Record(name)
                 for phone in phones:
                     record.add_phone(phone)
                 for email in emails:
                     record.add_email(email)
+                for address in addresses:
+                    record.add_address(address)
                 if birthday_str:
                     record.add_birthday(birthday_str)
                 address_book.add_record(record)
     except FileNotFoundError:
         pass
+
+
+notebook = NoteBook()     # temporary initiallization of notebook later will be changed to reading from file
 
 # Виведення усіх контактів
 @input_error
@@ -164,14 +247,16 @@ def list_contacts(address_book):
         table = Table(title="All Contacts")
         table.add_column("Name 👤", style="cyan", justify="left")
         table.add_column("Phones 📞", style="magenta", justify="center")
-        table.add_column("Emails 📧", style="yellow", justify="center")  # Нова колонка для виведення електронних адрес
+        table.add_column("Emails 📧", style="yellow", justify="center")
+        table.add_column("Addresses 🏠", style="blue", justify="center") 
         table.add_column("Birthday 🎂", style="green", justify="center")
 
         for record in address_book.data.values():
             phone_str = ', '.join([f"[cyan]{phone}[/cyan]" for phone in record.phones])
-            email_str = ', '.join([f"[yellow]{email}[/yellow]" for email in record.emails])  # Додаємо виведення електронних адрес
+            email_str = ', '.join([f"[yellow]{email}[/yellow]" for email in record.emails])
+            address_str = ', '.join([f"[blue]{address}[/blue]" for address in record.addresses]) 
             birthday_str = str(record.birthday) if record.birthday else ""
-            table.add_row(record.name.value, phone_str, email_str, birthday_str)
+            table.add_row(record.name.value, phone_str, email_str, address_str, birthday_str)
 
         console.print(table)
 
@@ -190,20 +275,6 @@ def add_contact(args, address_book):
         return "Contact added."
     else:
         raise ValueError("Give me name and phone please. Use add <name> <phone number>")
-
-# Зміна номера телефону
-@input_error
-def change_contact(args, address_book):
-    if len(args) == 2:
-        name, new_phone = args
-        record = address_book.find(name)
-        if record:
-            record.edit_phone(record.phones[0].value, new_phone)
-            return f"Phone number for {name} changed to {new_phone}."
-        else:
-            raise KeyError
-    else:
-        raise ValueError("Give me name and new phone please.")
 
 # Пошук контактів 
 def find_contact(args, address_book):
@@ -228,21 +299,6 @@ def delete_contact(args, address_book):
         raise ValueError("Give me a name to delete.")
 
 # PHONE NUMBER
-# Зміна номера телефону
-@input_error
-def change_contact(args, address_book):
-    if len(args) == 2:
-        name, new_phone = args
-        record = address_book.find(name)
-        if record:
-            record.edit_phone(record.phones[0].value, new_phone)
-            return f"Phone number for {name} changed to {new_phone}."
-        else:
-            raise KeyError
-    else:
-        raise ValueError("Give me name and new phone please.")
-
-
 # Додавання номера для існуючого контакту
 @input_error
 def add_phone_to_contact(args, address_book):
@@ -253,9 +309,9 @@ def add_phone_to_contact(args, address_book):
             record.add_phone(new_phone)
             return f"Phone number {new_phone} added to {name}."
         else:
-            raise KeyError
+            raise KeyError 
     else:
-        raise ValueError("Give me name and new phone please.")
+        raise ValueError("Give me name and new phone please.") 
 
 # Видалення номера для існуючого контакту
 @input_error
@@ -267,9 +323,9 @@ def remove_phone_from_contact(args, address_book):
             record.remove_phone(old_phone)
             return f"Phone number {old_phone} removed from {name}."
         else:
-            raise KeyError
+            raise KeyError 
     else:
-        raise ValueError("Give me name and phone to remove please.")
+        raise ValueError("Give me name and phone to remove please.") 
 
 # Редагування номера телефону для існуючого контакту
 @input_error
@@ -301,11 +357,12 @@ def find_by_phone(args, address_book):
         raise ValueError("Give me a phone number to find.")
     
 # EMAIL
-# Додамо нові функції для обробки email
-
+# Email validation
 def is_valid_email(email):
     return re.match(r'\S+@\S+\.\S+', email) is not None
 
+# Add email
+@input_error
 def add_email_to_contact(args, address_book):
     if len(args) == 2:
         name, new_email = args
@@ -317,11 +374,14 @@ def add_email_to_contact(args, address_book):
             else:
                 return "Invalid email format."
         else:
-            return "Contact not found."
+            raise KeyError 
+            #return "Contact not found."
     else:
-        return "Give me name and new email please."
+        raise ValueError ("Give me name and new email please.")
     return ""
 
+#Remove Email
+@input_error
 def remove_email_from_contact(args, address_book):
     if len(args) == 2:
         name, old_email = args
@@ -330,10 +390,11 @@ def remove_email_from_contact(args, address_book):
             record.remove_email(old_email)
             return f"Email {old_email} removed from {name}."
         else:
-            raise KeyError
+            raise KeyError 
     else:
         raise ValueError("Give me name and email to remove please.")
 
+@input_error
 def edit_email_for_contact(args, address_book):
     if len(args) == 3:
         name, old_email, new_email = args
@@ -345,7 +406,27 @@ def edit_email_for_contact(args, address_book):
             raise KeyError
     else:
         raise ValueError("Give me name, old email, and new email please.")
-    
+
+# ADDRESS
+# Add address
+@input_error    
+def add_address_to_contact(args, address_book):
+    if len(args) == 2:
+        name, new_address = args
+        record = address_book.find(name)
+        if record:
+            try:
+                record.add_address(new_address)
+                return f"Address {new_address} added to {name}."
+            except ValueError as e:
+                print(str(e))
+        else:
+            raise KeyError 
+    else:
+        raise ValueError("Give me name and new address please.")
+    return ""
+
+
 # HAPPY BD
 #Додавання дня народження
 @input_error
@@ -420,50 +501,89 @@ def show_upcoming_birthdays(address_book):
         names_to_congratulate = ', '.join(el[1])
         print(f'{days_of_week[el[0]]}: {names_to_congratulate}')
 
+# NOTES 
+# processing user input funtions
+
+def add_record_notebook(args, notebook):
+    notebook.add_record_notebook(NoteRecord(' '.join(args)))
+    
+    return 'Note added to the notebook'
+
+
 # DATABASE
 # Збереження контактів у текстовий файл  
 @input_error
 def save_contacts(address_book, filename="contacts.txt"):
     with open(filename, "w") as file:
         for record in address_book.data.values():
-            email_str = ';'.join(map(str, record.emails)) if record.emails else ""
             birthday_str = str(record.birthday) if record.birthday else ""
-            file.write(f"{record.name.value}:{';'.join(map(str, record.phones))}:{email_str}:{birthday_str}\n")
+            phones_str = ';'.join(map(str, record.phones))
+            emails_str = ';'.join(map(str, record.emails))
+            addresses_str = ';'.join(map(str, record.addresses))  # Додайте це
+            file.write(f"{record.name.value}:{phones_str}:{emails_str}:{addresses_str}:{birthday_str}\n")
+
+def get_valid_commands():
+    address_book = AddressBook()
+    commands = [
+        "close", "exit", "hello", "add", "all", "find",
+        "del", "add-phone", "remove-phone", "edit-phone", "find-phone",
+        "add-birthday", "show-birthday", "birthdays", "help", "add-email",
+
+        "remove-email", "edit-email", "add-address"
+    ]
+
+    # Add dynamically generated commands based on the address book data
+    commands += list(address_book.data.keys())
+
+    return commands
+
+def get_user_input():
+    completer = WordCompleter(get_valid_commands(), ignore_case=True)
+    return prompt("Enter command: ", completer=completer)
 
 
 # POPUP
 # Меню Help
+
 def display_help():
     print('-' * 45 + '\nMain commands:\n'
                      'hello - greeting message\n'
+                     'help - display all comands  from menu\n'
+                     'close/exit - save added contacts/notes and finish work\n'
+                     '\nSearch:\n'
                      'all - show all contacts\n'
                      'find - number search by name\n'
-                     'findphone - search contacts by phone number\n'
-                     'add - add new contact\\contact number\n'
-                     'change - change contact number\n'
+                     'find-phone - search contacts by phone number\n'
+                     '\nContact:\n'
+                     'add - add new contact\n'
+                     'del - delete contact\\number\n'
+                     '\nPhone:\n'
                      'add-phone - add phone number to an existing contact\n'
                      'remove-phone - remove phone number from an existing contact\n'
-                     'editphone - edit phone number for an existing contact\n'
-                     'add-email - add email to an existing contact\n'  # Додана команда
-                     'remove-email - remove email from an existing contact\n'  # Додана команда
-                     'editemail - edit email for an existing contact\n'  # Додана команда
+                     'edit-phone - edit phone number for an existing contact\n'
+                     '\nEmail:\n'
+                     'add-email - add email to an existing contact\n'
+                     'remove-email - remove email from an existing contact\n'  
+                     'edit-email - edit email for an existing contact\n'
+                     '\nBirthday:\n'
                      'add-birthday - add birthday to an existing contact\n'
                      'edit-birthday - edit birthday of an existing contact\n'
                      'show-birthday - show birthday of a contact\n'
                      'birthdays - show upcoming birthdays\n'
-                     'del - delete contact\\number\n'
-                     'help - display all comands  from menu\n' + '-' * 45)
+                     '\nAddress:\n'
+                     'add-address add address for an existing contact\n' + '-' * 45)
 
 
 # Команди бота
 def main():
     address_book = AddressBook()
-    load_contacts(address_book)  
+    load_contacts(address_book)
+    display_help() 
     
     print("Greeting you, my young padawan!")
     
     while True:
-        user_input = input("Enter command: ")
+        user_input = get_user_input()
 
         # Перевірка на пустий рядок перед викликом parse_input
         if not user_input:
@@ -477,25 +597,23 @@ def main():
             break
         elif command == "hello":
             print("How can I help you?")
-        elif command == "add":
+        elif command == "add":                                      # Contact
             print(add_contact(args, address_book))
         elif command == "all":
             print(list_contacts(address_book))
-        elif command == "change":
-            print(change_contact(args, address_book))
         elif command == "find":
             print(find_contact(args, address_book))
         elif command == "del":
             print(delete_contact(args, address_book))
-        elif command == "add-phone":
+        elif command == "add-phone":                                # Phone
             print(add_phone_to_contact(args, address_book))
         elif command == "remove-phone":
             print(remove_phone_from_contact(args, address_book))
         elif command == "edit-phone":
             print(edit_phone_for_contact(args, address_book))
-        elif command == "findphone":
+        elif command == "find-phone":
             print(find_by_phone(args, address_book))
-        elif command == "add-birthday":
+        elif command == "add-birthday":                             # Happy BD
             print(add_birthday_to_contact(args, address_book))
         elif command == "edit-birthday":
             print(edit_birthday_for_contact(args, address_book))
@@ -503,17 +621,22 @@ def main():
             print(show_birthday(args, address_book))
         elif command == "birthdays":
             show_upcoming_birthdays(address_book)
-        elif command == "add-email":
+        elif command == "add-email":                                # EMAIL
             print(add_email_to_contact(args, address_book))
         elif command == "remove-email":
             print(remove_email_from_contact(args, address_book))
-        elif command == "editemail":
+        elif command == "edit-email":
             print(edit_email_for_contact(args, address_book))
+        elif command == "add-address":                              # Address
+            print(add_address_to_contact(args, address_book))
         elif command == 'help':
             display_help()
+        elif command == "add-note":                                 # NOTES specific commands start
+            print(add_record_notebook(args, notebook))
+        elif command == "all-notes":                         
+            notebook.show_all_notes()
         else:
             print("Invalid command.")
 
 if __name__ == "__main__":
     main()
-

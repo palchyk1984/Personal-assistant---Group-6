@@ -1,66 +1,89 @@
-# Personal-assistant---Group-6
 
-Coommands:
+# BABY YODA
+The personal assistant (MCS-Group-6)
+```
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⢀⣠⡴⠖⣛⣋⣭⣭⣭⣍⣙⡓⠶⢤⣀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⡴⢋⣥⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣍⡳⣦⡀⠀⠀⠀⠀
+⠀⠀⢀⡴⢋⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠻⣄⠀⠀⠀
+⠀⠀⠞⣱⣿⣿⣿⣿⣿⣿⠿⠟⠛⢉⠙⠛⠻⢿⣿⣿⣿⣿⣿⣷⡘⣧⠀⠀
+⠀⢲⣤⣤⣀⡉⠉⠙⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠛⠛⠛⠛⠓⠚⠓⡀
+⢰⡇⠻⣿⣿⣿⣷⡀⠀⡠⣤⣀⠀⠀⠀ ⠀⡈⢬⣀⠀⢠⣶⣿⣿⣿⣿⢏⠀
+⢸⡇⣷⣌⡛⠛⠻⠇⠈⠻⠿⠿⠂⠄⠄⠸⠿⠿⠛⠀⠸⠿⠿⠿⣛⡕⢹⠀
+⠸⡇⣿⣿⣿⣿⣷⣶⣄⣀⣀⣀⣀⣀⣀⣀⣠⣄⣠⣤⣶⣶⣿⣿⣿⡇⣼⠀
+⠀⢷⠸⣿⣿⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣿⠿⢻⡟⠁⢀⣻⣿⣿⢡⡇⠀
+⠀⠈⢧⡹⣿⣿⣿⣷⡀⠀⠉⠿⡿⠛⠋⠁⠀ ⠀⣿⣷⣶⣾⣿⡿⢡⡟⠀⠀
+⠀⠀⠈⠳⣌⠿⣿⣈⣙⠇⠀⠈⡁⠀⠀⠀⠀ ⠀⢻⣿⣿⣿⠟⣵⠏⠀⠀⠀
+⠀⠀⠀⠀⠙⠳⣌⡛⢿⡀⠀⢀⠀⠀⠀⠀ ⠀⠀⣸⠿⢋⡵⠞⠁⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠈⠙⠲⠦⣭⣘⣒⣒⣒⣒⣨⡭⠴⠚⠉⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀
+"Greetings to you, my young padawan!"⠀⠀⠀⠀⠀
+```
+## Brief Description & Functionality:
+The main goal of the project was to create a personal console bot - an assistant that has a functional interface and can work with text data, display them on the screen, delete/replace/search for pieces of information, and save everything in a file on the hard disk.
 
-    - help - display all comands                   
-    - hello - greeting message
+## How To Install?
 
-Address book 
+For correct work of this application before launching a code you have to install Virtual packages:
 
-    Search:
-    - all contact - show all contacts
-    - by name - search by contact name
-    - by phone number - search contact by phone number
-    - birthdays - show upcoming birthdays
-    - contact-birthday - show birthday of a contact
+```
+1. pip install virtualenv
+2. virtualenv venv
+3. source venv/bin/activate (For Linux/macOS)
+4. pip3 install -r requirements.txt
 
-    Add new:
-    - contact - add new contact
+```
 
-    - add-phone - add phone number to an existing contact
-    - add-email - add email to an existing contact
-    - add-birthday - add birthday to an existing contact
+## The List of Commands:
+`help` - display all commands                   
+`hello` - greeting message
 
-    Edit:
-    - editphone - edit phone number for an existing contact
-    - change - change contact number ? 
-    - remove phone - remove phone number from an existing contact
-    - remove email - remove emailr from an existing contact
-    - del contact - delete contact record from database
+### Address Book: 
+##### Search:
+`all contact` - show all contacts <br> 
+`by name` - search by contact name <br> 
+`by phone number` - search contact by phone number <br> 
+`birthdays` - show upcoming birthdays <br> 
+`contact-birthday` - show the birthday of a contact <br> 
+##### Add new:
+`contact` - add a new contact <br> 
+`add-phone` - add a phone number to an existing contact <br> 
+`add-email` - add email to an existing contact <br> 
+`add-birthday` - add a birthday to an existing contact <br> 
+##### Edit:
+`editphone` - edit phone number for an existing contact <br> 
+`change` - change contact number? <br> 
+`remove phone` - remove phone number from an existing contact <br> 
+`remove email` - remove email from an existing contact <br> 
+`del contact` - delete contact record from the database <br> 
+### Notebook:
+`all notes` - show all notes <br> 
+`new note` - add a new note <br> 
+`Add tag` - add a tag to an existing note <br> 
+`Edit note` - edit note description <br> 
 
-Notebook
+## Additional Features Implemented:
+* Smart console suggesting
+* Custom UI
+* *
+* *
+* *
+## Tools Used:
+* Python
+* Git
+* Brains
+#### Python Modules Used:
+* **Rich** - https://github.com/Textualize/rich
+* **Promt-toolkit** - 
 
-    - all notes - show all notes
-    - new note - add new note
-    - Add tag - add tag to existing note
-    - Edit note - edit note description
+## Dev's:
+1. Oleksii Palchyk - https://github.com/palchyk1984
+2. Oleksandr Starovit - https://github.com/Olekstar
+3. Roman Serafymovych - https://github.com/serafim1984
+4. Dmytro Kutsenko - https://github.com/dmitrykutsenko
+5. Ihor Vitkovskyi - https://github.com/ArtistMef
+
+
+## May the code be with you!
     
 
-                 _.' :  `._
-             .-.'`.  ;   .'`.-.
-    __      / : ___\ ;  /___ ; \      __
-  ,'_ ""--.:__;".-.";: :".-.":__;.--"" _`,
-  :' `.t""--.. '<@.`;_  ',@>` ..--""j.' `;
-       `:-.._J '-.-'L__ `-- ' L_..-;'
-         "-.__ ;  .-"  "-.  : __.-"
-             L ' /.------.\ ' J
-              "-.   "--"   .-"
-             __.l"-:_JL_;-";.__
-          .-j/'.;  ;""""  / .'\"-.
-        .' /:`. "-.:     .-" .';  `.
-     .-"  / ;  "-. "-..-" .-"  :    "-.
-  .+"-.  : :      "-.__.-"      ;-._   \
-  ; \  `.; ;                    : : "+. ;
-  :  ;   ; ;                    : ;  : \:
- : `."-; ;  ;                  :  ;   ,/;
-  ;    -: ;  :                ;  : .-"'  :
-  :\     \  : ;             : \.-"      :
-   ;`.    \  ; :            ;.'_..--  / ;
-   :  "-.  "-:  ;          :/."      .'  :
-     \       .-`.\        /t-""  ":-+.   :
-      `.  .-"    `l    __/ /`. :  ; ; \  ;
-        \   .-" .-"-.-"  .' .'j \  /   ;/
-         \ / .-"   /.     .'.' ;_:'    ;
-          :-""-.`./-.'     /    `.___.'
-                \ `t  ._  /  bug :F_P:
-                 "-.t-._:'
