@@ -577,33 +577,43 @@ def save_notes(notebook, filename="notebook.txt"):
 # POPUP
 # Меню Help
 
+# Опреділити стилі тексту
+bold_underline = "bold underline"
+yellow_text = "yellow"
+
+# Опреділити стилі тексту
+bold_underline = "bold underline"
+green_text = "green"
+white_text = "white"
+
+# Опреділити стилі тексту
+bold_underline = "bold underline"
+green_text = "bold green"
+white_text = "white"
+
 def display_help():
-    print('-' * 45 + '\nMain commands:\n'
-                     'hello - greeting message\n'
-                     'help - display all comands  from menu\n'
-                     'close/exit - save added contacts/notes and finish work\n'
-                     '\nSearch:\n'
-                     'all - show all contacts\n'
-                     'find - number search by name\n'
-                     'find-phone - search contacts by phone number\n'
-                     '\nContact:\n'
-                     'add - add new contact\n'
-                     'del - delete contact\\number\n'
-                     '\nPhone:\n'
-                     'add-phone - add phone number to an existing contact\n'
-                     'remove-phone - remove phone number from an existing contact\n'
-                     'edit-phone - edit phone number for an existing contact\n'
-                     '\nEmail:\n'
-                     'add-email - add email to an existing contact\n'
-                     'remove-email - remove email from an existing contact\n'  
-                     'edit-email - edit email for an existing contact\n'
-                     '\nBirthday:\n'
-                     'add-birthday - add birthday to an existing contact\n'
-                     'edit-birthday - edit birthday of an existing contact\n'
-                     'show-birthday - show birthday of a contact\n'
-                     'birthdays - show upcoming birthdays\n'
-                     '\nAddress:\n'
-                     'add-address add address for an existing contact\n' + '-' * 45)
+    console = Console()
+
+    # Виведення заголовка
+    console.print("Help Menu", style=bold_underline)
+
+    # Виведення категорій та команд для кожної категорії
+    categories = {
+        "Main commands": ["hello - greeting message", "help - display all commands from the menu", "close/exit - save added contacts/notes and finish work"],
+        "Search": ["all - show all contacts", "find - number search by name", "find-phone - search contacts by phone number"],
+        "Contact": ["add - add new contact", "del - delete contact/number"],
+        "Phone": ["add-phone - add phone number to an existing contact", "remove-phone - remove phone number from an existing contact", "edit-phone - edit phone number for an existing contact"],
+        "Email": ["add-email - add email to an existing contact", "remove-email - remove email from an existing contact", "edit-email - edit email for an existing contact"],
+        "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", "birthdays - show upcoming birthdays"],
+        "Address": ["add-address - add address for an existing contact"],
+    }
+
+    for category, commands in categories.items():
+        console.print(f"\n{category}:", style=bold_underline)
+        for command in commands:
+            # Виведення рядка з різним кольором для кожного елемента
+            console.print(f"[{green_text}]{command.split(' - ', 1)[0]}[/{green_text}] - {command.split(' - ', 1)[1]}", style=white_text)
+
 
 
 # Команди бота
