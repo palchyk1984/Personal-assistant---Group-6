@@ -606,7 +606,7 @@ def get_valid_commands():
         "add-phone", "remove-phone", "edit-phone", "find-phone",
         "add-birthday", "edit-birthday", "show-birthday", "birthdays",
         "add-email","remove-email", "edit-email", 
-        "add-address", "edit-address" ,"remove-address"
+        "add-address", "edit-address" ,"remove-address",
         "add-note", "all-notes"
     ]
 
