@@ -1,6 +1,29 @@
-# Personal-assistant-Group-6
 
-## Instalation
+# BABY YODA
+The personal assistant (MCS-Group-6)
+```
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⢀⣠⡴⠖⣛⣋⣭⣭⣭⣍⣙⡓⠶⢤⣀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⡴⢋⣥⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣍⡳⣦⡀⠀⠀⠀⠀
+⠀⠀⢀⡴⢋⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠻⣄⠀⠀⠀
+⠀⠀⠞⣱⣿⣿⣿⣿⣿⣿⠿⠟⠛⢉⠙⠛⠻⢿⣿⣿⣿⣿⣿⣷⡘⣧⠀⠀
+⠀⢲⣤⣤⣀⡉⠉⠙⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠛⠛⠛⠛⠓⠚⠓⡀
+⢰⡇⠻⣿⣿⣿⣷⡀⠀⡠⣤⣀⠀⠀⠀ ⠀⡈⢬⣀⠀⢠⣶⣿⣿⣿⣿⢏⠀
+⢸⡇⣷⣌⡛⠛⠻⠇⠈⠻⠿⠿⠂⠄⠄⠸⠿⠿⠛⠀⠸⠿⠿⠿⣛⡕⢹⠀
+⠸⡇⣿⣿⣿⣿⣷⣶⣄⣀⣀⣀⣀⣀⣀⣀⣠⣄⣠⣤⣶⣶⣿⣿⣿⡇⣼⠀
+⠀⢷⠸⣿⣿⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣿⠿⢻⡟⠁⢀⣻⣿⣿⢡⡇⠀
+⠀⠈⢧⡹⣿⣿⣿⣷⡀⠀⠉⠿⡿⠛⠋⠁⠀ ⠀⣿⣷⣶⣾⣿⡿⢡⡟⠀⠀
+⠀⠀⠈⠳⣌⠿⣿⣈⣙⠇⠀⠈⡁⠀⠀⠀⠀ ⠀⢻⣿⣿⣿⠟⣵⠏⠀⠀⠀
+⠀⠀⠀⠀⠙⠳⣌⡛⢿⡀⠀⢀⠀⠀⠀⠀ ⠀⠀⣸⠿⢋⡵⠞⠁⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠈⠙⠲⠦⣭⣘⣒⣒⣒⣒⣨⡭⠴⠚⠉⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀
+"Greetings to you, my young padawan!"⠀⠀⠀⠀⠀
+```
+## Brief Description & Functionality:
+The main goal of the project was to create a personal console bot - an assistant that has a functional interface and can work with text data, display them on the screen, delete/replace/search for pieces of information, and save everything in a file on the hard disk.
+
+## How To Install?
+
 For correct work of this application before launching a code you have to install Virtual packages:
 
 ```
@@ -11,83 +34,56 @@ For correct work of this application before launching a code you have to install
 
 ```
 
+## The List of Commands:
+`help` - display all commands                   
+`hello` - greeting message
 
-## Command list
+### Address Book: 
+##### Search:
+`all contact` - show all contacts <br> 
+`by name` - search by contact name <br> 
+`by phone number` - search contact by phone number <br> 
+`birthdays` - show upcoming birthdays <br> 
+`contact-birthday` - show the birthday of a contact <br> 
+##### Add new:
+`contact` - add a new contact <br> 
+`add-phone` - add a phone number to an existing contact <br> 
+`add-email` - add email to an existing contact <br> 
+`add-birthday` - add a birthday to an existing contact <br> 
+##### Edit:
+`editphone` - edit phone number for an existing contact <br> 
+`change` - change contact number? <br> 
+`remove phone` - remove phone number from an existing contact <br> 
+`remove email` - remove email from an existing contact <br> 
+`del contact` - delete contact record from the database <br> 
+### Notebook:
+`all notes` - show all notes <br> 
+`new note` - add a new note <br> 
+`Add tag` - add a tag to an existing note <br> 
+`Edit note` - edit note description <br> 
 
-```
-        Main commands:
-        hello - greeting message
-        help - display all comands  from menu
-        close/exit - save added contacts/notes and finish work
+## Additional Features Implemented:
+* Smart console suggesting
+* Custom UI
+* *
+* *
+* *
+## Tools Used:
+* Python
+* Git
+* Brains
+#### Python Modules Used:
+* **Rich** - https://github.com/Textualize/rich
+* **Promt-toolkit** - 
 
-        Search:
-        all - show all contacts
-        find - number search by name
-        find-phone - search contacts by phone number
+## Dev's:
+1. Oleksii Palchyk - https://github.com/palchyk1984
+2. Oleksandr Starovit - https://github.com/Olekstar
+3. Roman Serafymovych - https://github.com/serafim1984
+4. Dmytro Kutsenko - https://github.com/dmitrykutsenko
+5. Ihor Vitkovskyi - https://github.com/ArtistMef
 
-        Contact:
-        add - add new contact
-        del - delete contact\number
 
-        Phone:
-        add-phone - add phone number to an existing contact
-        remove-phone - remove phone number from an existing contact
-        edit-phone - edit phone number for an existing contact
-
-        Email:
-        add-email - add email to an existing contact
-        remove-email - remove email from an existing contact
-        edit-email - edit email for an existing contact
-
-        Birthday:
-        add-birthday - add birthday to an existing contact
-        show-birthday - show birthday of a contact
-        birthdays - show upcoming birthdays
-
-        Address:
-        add-address add address for an existing contact
-
-        Notebook
-
-        all-notes - show all notes
-        notes-day - show note per day
-        notes-month - show notes per month
-        notes-year - show notes per year
-        find-ID - search note by ID
-        new-note - add new note
-        add-tag - add tag to existing note
-        edit-note - edit note description
-        delete-note - delete specific note
-```
+## May the code be with you!
     
-
-    
-                 _.' :  `._
-             .-.'`.  ;   .'`.-.
-    __      / : ___\ ;  /___ ; \      __
-  ,'_ ""--.:__;".-.";: :".-.":__;.--"" _`,
-  :' `.t""--.. '<@.`;_  ',@>` ..--""j.' `;
-       `:-.._J '-.-'L__ `-- ' L_..-;'
-         "-.__ ;  .-"  "-.  : __.-"
-             L ' /.------.\ ' J
-              "-.   "--"   .-"
-             __.l"-:_JL_;-";.__
-          .-j/'.;  ;""""  / .'\"-.
-        .' /:`. "-.:     .-" .';  `.
-     .-"  / ;  "-. "-..-" .-"  :    "-.
-  .+"-.  : :      "-.__.-"      ;-._   \
-  ; \  `.; ;                    : : "+. ;
-  :  ;   ; ;                    : ;  : \:
- : `."-; ;  ;                  :  ;   ,/;
-  ;    -: ;  :                ;  : .-"'  :
-  :\     \  : ;             : \.-"      :
-   ;`.    \  ; :            ;.'_..--  / ;
-   :  "-.  "-:  ;          :/."      .'  :
-     \       .-`.\        /t-""  ":-+.   :
-      `.  .-"    `l    __/ /`. :  ; ; \  ;
-        \   .-" .-"-.-"  .' .'j \  /   ;/
-         \ / .-"   /.     .'.' ;_:'    ;
-          :-""-.`./-.'     /    `.___.'
-                \ `t  ._  /  bug :F_P:
-                 "-.t-._:'
 
