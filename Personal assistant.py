@@ -543,6 +543,7 @@ def get_valid_commands():
         "close", "exit", "hello", "add", "all", "change", "find",
         "del", "add-phone", "remove-phone", "edit-phone", "find-phone",
         "add-birthday", "show-birthday", "birthdays", "help", "add-email",
+
         "remove-email", "edit-email", "add-address"
     ]
 
