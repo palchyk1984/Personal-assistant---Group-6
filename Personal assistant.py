@@ -122,9 +122,16 @@ class Tag(Field):
             raise ValueError("Tag should be max 10 digits")
         super().__init__(value)
 
+class Notename(Field):
+    def __init__(self, value):
+        if not value.isdigit() or len(value) > 20:
+            raise ValueError("Note name should be max 20 digits")
+        super().__init__(value)
+
+
 class Timestamp():                 
-    def __init__(self, ID = 0):
-        self.ts = datetime.now()
+    def __init__(self, ID = 0, ts = datetime.now()):
+        self.ts = ts
         self.ID = ID
 
     def ID(self):
@@ -211,7 +218,25 @@ def load_contacts(address_book, filename="contacts.txt"):
     except FileNotFoundError:
         pass
 
-notebook = NoteBook()     # temporary initiallization of notebook later will be changed to reading from file
+#notebook = NoteBook()     # temporary initiallization of notebook later will be changed to reading from file
+
+# Завантаження ноутів з текстового файлу
+@input_error
+def load_notes(notebook, filename="notebook.txt"):
+    try:
+        with open(filename, "r") as file:
+            for line in file:
+                timestamp_ts_str, timestamp_ID_str, tags_str, note_str = line.strip().split(":")
+                tags = tags_str.split(";")
+                note = Note(note_str)
+                time_stamp = Timestamp(int(timestamp_ID_str), datetime.strptime(timestamp_ts_str, '%d/%m/%y %H:%M:%S.%f'))
+                note_record = NoteRecord(note)
+                note_record.timestamp = time_stamp
+                note_record.tags = tags
+                notebook.add_record_notebook(note_record)
+
+    except FileNotFoundError:
+        pass
 
 # Виведення усіх контактів
 @input_error
@@ -501,6 +526,13 @@ def get_user_input():
     completer = WordCompleter(get_valid_commands(), ignore_case=True)
     return prompt("Enter command: ", completer=completer)
 
+# Збереження ноутів у текстовий файл  
+@input_error
+def save_notes(notebook, filename="notebook.txt"):
+    with open(filename, "w") as file:
+        for noterecord in notebook.data.values():
+            tags_str = ';'.join(map(str, noterecord.tags)) if noterecord.tags else ""
+            file.write(f"{noterecord.timestamp.ts}:{noterecord.timestamp.ID}:{tags_str}:{noterecord.note}\n")
 
 # POPUP
 # Меню Help
@@ -530,7 +562,9 @@ def display_help():
 # Команди бота
 def main():
     address_book = AddressBook()
+    notebook = NoteBook()
     load_contacts(address_book)
+    load_notes(notebook)
     display_help() 
     
     print("Greeting you, my young padawan!")
@@ -546,6 +580,7 @@ def main():
 
         if command in ["close", "exit"]:
             save_contacts(address_book)
+            save_notes(notebook)
             print("Goodbye!")
             break
         elif command == "hello":
@@ -591,4 +626,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
