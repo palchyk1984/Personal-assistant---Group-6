@@ -2,13 +2,16 @@ import re
 from datetime import datetime, timedelta
 from collections import defaultdict
 from rich.console import Console
+from rich.text import Text
 from rich.table import Table
+from rich.panel import Panel
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
 console = Console()
 
-# Classes
+## Classes
+
 class Field:
     def __init__(self, value):
         self.value = value
@@ -25,7 +28,6 @@ class Phone(Field):
             raise ValueError("Phone number format should be max 10 digits")
         super().__init__(value)
 
-# Додано класс для Email
 class Email(Field):
     def __init__(self, value):
         if not is_valid_email(value):
@@ -49,7 +51,8 @@ class Record:
         self.addresses = []
         self.birthday = None
 
-    #Методи для Phone
+    # Phone
+        
     def add_phone(self, phone):
         new_phone = Phone(phone)
         self.phones.append(new_phone)
@@ -67,8 +70,8 @@ class Record:
                 return p
         return None
 
+    # Email
 
-    #Методи для Email
     def add_email(self, email):
         new_email = Email(email)
         self.emails.append(new_email)
@@ -86,28 +89,26 @@ class Record:
                 return e
         return None
     
-    #Методи для Birthday
+    # Birthday
+
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
-
 
     def edit_birthday(self, new_birthday):
         self.birthday = Birthday(new_birthday)
 
-    #Методи для Adsress
+    # Adsress
+        
     def add_address(self, address):
         new_address = Address(address)
         self.addresses.append(new_address)
 
-     #Метод remove_address
     def remove_address(self, address):
         self.addresses = [a for a in self.addresses if str(a) != address]
 
-    # Метод edit_address
     def edit_address(self, old_address, new_address):
         self.remove_address(old_address)
         self.add_address(new_address)
-
 
     def __str__(self):
         phones_str = ', '.join(map(str, self.phones))
@@ -154,7 +155,6 @@ class Timestamp():
     def increment_ID(self):
         self.ID += 1
     
-
     def __str__(self):
         return f'{self.ts} ID: {self.ID}'
 
@@ -211,9 +211,9 @@ def input_error(func):
         except ValueError as e:
             return str(e)
         except KeyError:
-            return "Contact not found." #Traceback !
+            return "Contact not found."
         except IndexError:
-            return "Invalid command format." #Traceback !
+            return "Invalid command format."
 
     return inner
 
@@ -260,7 +260,7 @@ def load_notes(notebook, filename="notebook.txt"):
     except FileNotFoundError:
         pass
 
-# Виведення усіх контактів
+## VIEW All Contacts
 @input_error
 def list_contacts(address_book):
     if not address_book.data:
@@ -285,7 +285,7 @@ def list_contacts(address_book):
     return ""
 
 
-# CONTACT
+## CONTACT
 # Додавання контакту
 @input_error
 def add_contact(args, address_book):
@@ -320,7 +320,7 @@ def delete_contact(args, address_book):
     else:
         raise ValueError("Give me a name to delete.")
 
-# PHONE NUMBER
+## PHONE NUMBER
 # Додавання номера для існуючого контакту
 @input_error
 def add_phone_to_contact(args, address_book):
@@ -378,7 +378,7 @@ def find_by_phone(args, address_book):
     else:
         raise ValueError("Give me a phone number to find.")
     
-# EMAIL
+## EMAIL
 # Email validation
 def is_valid_email(email):
     return re.match(r'\S+@\S+\.\S+', email) is not None
@@ -402,7 +402,7 @@ def add_email_to_contact(args, address_book):
         raise ValueError ("Give me name and new email please.")
     return ""
 
-#Remove Email
+# Remove Email
 @input_error
 def remove_email_from_contact(args, address_book):
     if len(args) == 2:
@@ -429,8 +429,10 @@ def edit_email_for_contact(args, address_book):
     else:
         raise ValueError("Give me name, old email, and new email please.")
 
-# ADDRESS
+## ADDRESS
+    
 # Add address
+    
 @input_error    
 def add_address_to_contact(args, address_book):
     if len(args) == 2:
@@ -448,9 +450,41 @@ def add_address_to_contact(args, address_book):
         raise ValueError("Give me name and new address please.")
     return ""
 
+# Edit address
 
-# HAPPY BD
+@input_error
+def edit_address_for_contact(args, address_book):
+    if len(args) == 3:
+        name, old_address, new_address = args
+        record = address_book.find(name)
+        if record:
+            record.edit_address(old_address, new_address)
+            return f"Address {old_address} for {name} edited to {new_address}."
+        else:
+            raise KeyError
+    else:
+        raise ValueError("Give me name, old address, and new address please.")
+
+# Edit address
+    
+@input_error
+def remove_address_from_contact(args, address_book):
+    if len(args) == 2:
+        name, address = args
+        record = address_book.find(name)
+        if record:
+            record.remove_address(address)
+            return f"Address {address} removed from {name}."
+        else:
+            raise KeyError 
+    else:
+        raise ValueError("Give me name and address to remove please.")
+
+
+## HAPPY BD
+    
 #Додавання дня народження
+    
 @input_error
 def add_birthday_to_contact(args, address_book):
     if len(args) == 2:
@@ -465,6 +499,7 @@ def add_birthday_to_contact(args, address_book):
         raise ValueError("Give me name and birthday (DD.MM.YYYY) please.")
 
 # Редагування дня народження контакту
+    
 @input_error
 def edit_birthday_for_contact(args, address_book):
     if len(args) == 2:
@@ -480,6 +515,7 @@ def edit_birthday_for_contact(args, address_book):
         raise ValueError("Give me name and new birthday (DD.MM.YYYY) please.")
     
 # Показ дня народження контакту
+    
 @input_error
 def show_birthday(args, address_book):
     if len(args) == 1:
@@ -498,6 +534,7 @@ def show_birthday(args, address_book):
 days_of_week = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
 
 # Дні народження на наступному тижні
+
 def show_upcoming_birthdays(address_book):
     birthday_next_week = defaultdict(list)
     start_of_year = datetime(year=datetime.now().year, month=1, day=1)
@@ -523,7 +560,7 @@ def show_upcoming_birthdays(address_book):
         names_to_congratulate = ', '.join(el[1])
         print(f'{days_of_week[el[0]]}: {names_to_congratulate}')
 
-# NOTES 
+## NOTES 
 # processing user input funtions
 
 def add_record_notebook(args, notebook):
@@ -546,8 +583,9 @@ def add_record_notebook(args, notebook):
     return 'Note added to the notebook'
 
 
-# DATABASE
+## DATABASE
 # Збереження контактів у текстовий файл  
+
 @input_error
 def save_contacts(address_book, filename="contacts.txt"):
     with open(filename, "w") as file:
@@ -558,14 +596,18 @@ def save_contacts(address_book, filename="contacts.txt"):
             addresses_str = ';'.join(map(str, record.addresses))  # Додайте це
             file.write(f"{record.name.value}:{phones_str}:{emails_str}:{addresses_str}:{birthday_str}\n")
 
+## Baby youda
 def get_valid_commands():
     address_book = AddressBook()
     commands = [
-        "close", "exit", "hello", "add", "all", "find",
-        "del", "add-phone", "remove-phone", "edit-phone", "find-phone",
-        "add-birthday", "show-birthday", "birthdays", "help", "add-email",
-        "add-note", "all-notes",
-        "remove-email", "edit-email", "add-address"
+        "close", "exit", "hello", "help", 
+        "add", "del",
+        "all", "find",
+        "add-phone", "remove-phone", "edit-phone", "find-phone",
+        "add-birthday", "edit-birthday", "show-birthday", "birthdays",
+        "add-email","remove-email", "edit-email", 
+        "add-address", "edit-address" ,"remove-address"
+        "add-note", "all-notes"
     ]
 
     # Add dynamically generated commands based on the address book data
@@ -585,40 +627,38 @@ def save_notes(notebook, filename="notebook.txt"):
             tags_str = ';'.join(map(str, noterecord.tags)) if noterecord.tags else ""
             file.write(f"{noterecord.timestamp.ts}_{noterecord.timestamp.ID}_{tags_str}_{noterecord.note}\n")
 
-# POPUP
+## POPUP
 # Меню Help
 
-def display_help():
-    print('-' * 45 + '\nMain commands:\n'
-                     'hello - greeting message\n'
-                     'help - display all comands  from menu\n'
-                     'close/exit - save added contacts/notes and finish work\n'
-                     '\nSearch:\n'
-                     'all - show all contacts\n'
-                     'find - number search by name\n'
-                     'find-phone - search contacts by phone number\n'
-                     '\nContact:\n'
-                     'add - add new contact\n'
-                     'del - delete contact\\number\n'
-                     '\nPhone:\n'
-                     'add-phone - add phone number to an existing contact\n'
-                     'remove-phone - remove phone number from an existing contact\n'
-                     'edit-phone - edit phone number for an existing contact\n'
-                     '\nEmail:\n'
-                     'add-email - add email to an existing contact\n'
-                     'remove-email - remove email from an existing contact\n'  
-                     'edit-email - edit email for an existing contact\n'
-                     '\nBirthday:\n'
-                     'add-birthday - add birthday to an existing contact\n'
-                     'edit-birthday - edit birthday of an existing contact\n'
-                     'show-birthday - show birthday of a contact\n'
-                     'birthdays - show upcoming birthdays\n'
-                     '\nAddress:\n'
-                     'add-address add address for an existing contact\n'
-                     '\nNotes:\n'
-                     'add-note - addin note\n'
-                     'all-notes - display all notes\n' + '-' * 45)
+# Mune styles
+bold_underline = "bold underline"
+green_text = "bold green"
+white_text = "white"
 
+def display_help():
+  
+    console = Console()
+
+    # Виведення заголовка
+    console.print("Help Menu", style=bold_underline)
+
+    # Виведення категорій та команд для кожної категорії
+    categories = {
+        "Main commands": ["hello - greeting message", "help - display all commands from the menu", "close/exit - save added contacts/notes and finish work"],
+        "Search": ["all - show all contacts", "find - number search by name", "find-phone - search contacts by phone number"],
+        "Contact": ["add - add new contact", "del - delete contact/number"],
+        "Phone": ["add-phone - add phone number to an existing contact", "remove-phone - remove phone number from an existing contact", "edit-phone - edit phone number for an existing contact"],
+        "Email": ["add-email - add email to an existing contact", "remove-email - remove email from an existing contact", "edit-email - edit email for an existing contact"],
+        "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", "birthdays - show upcoming birthdays"],
+        "Address": ["add-address - add address for an existing contact","edit-address - edit address for an existing contact","remove-address - remove address for an existing contact" ],
+        "Notes": ["add-note - addin note", "all-notes - display all notes"],
+    }
+
+    for category, commands in categories.items():
+        console.print(f"\n{category}:", style=bold_underline)
+        for command in commands:
+            # Виведення рядка з різним кольором для кожного елемента
+            console.print(f"[{green_text}]{command.split(' - ', 1)[0]}[/{green_text}] - {command.split(' - ', 1)[1]}", style=white_text)
 
 # Команди бота
 def main():
@@ -628,7 +668,30 @@ def main():
     load_notes(notebook)
     display_help() 
     
-    print("Greeting you, my young padawan!")
+    #print("Greeting you, my young padawan!")
+    baby_yoda_ascii_art = """
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠀⠀⠀⠀⢀⣠⡴⠖⣛⣋⣭⣭⣭⣍⣙⡓⠶⢤⣀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠀⠀⢀⡴⢋⣥⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣍⡳⣦⡀⠀⠀⠀⠀
+    ⠀⠀⢀⡴⢋⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠻⣄⠀⠀⠀
+    ⠀⠀⠞⣱⣿⣿⣿⣿⣿⣿⠿⠟⠛⢉⠙⠛⠻⢿⣿⣿⣿⣿⣿⣷⡘⣧⠀⠀
+    ⠀⢲⣤⣤⣀⡉⠉⠙⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠛⠛⠛⠛⠓⠚⠓⡀
+    ⢰⡇⠻⣿⣿⣿⣷⡀⠀⡠⣤⣀⠀⠀⠀ ⠀⡈⢬⣀⠀⢠⣶⣿⣿⣿⣿⢏⠀
+    ⢸⡇⣷⣌⡛⠛⠻⠇⠈⠻⠿⠿⠂⠄⠄⠸⠿⠿⠛⠀⠸⠿⠿⠿⣛⡕⢹⠀
+    ⠸⡇⣿⣿⣿⣿⣷⣶⣄⣀⣀⣀⣀⣀⣀⣀⣠⣄⣠⣤⣶⣶⣿⣿⣿⡇⣼⠀
+    ⠀⢷⠸⣿⣿⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣿⠿⢻⡟⠁⢀⣻⣿⣿⢡⡇⠀
+    ⠀⠈⢧⡹⣿⣿⣿⣷⡀⠀⠉⠿⡿⠛⠋⠁⠀ ⠀⣿⣷⣶⣾⣿⡿⢡⡟⠀⠀
+    ⠀⠀⠈⠳⣌⠿⣿⣈⣙⠇⠀⠈⡁⠀⠀⠀⠀ ⠀⢻⣿⣿⣿⠟⣵⠏⠀⠀⠀
+    ⠀⠀⠀⠀⠙⠳⣌⡛⢿⡀⠀⢀⠀⠀⠀⠀ ⠀⠀⣸⠿⢋⡵⠞⠁⠀⠀⠀⠀
+    ⠀⠀⠀⠀⠀⠀⠈⠙⠲⠦⣭⣘⣒⣒⣒⣒⣨⡭⠴⠚⠉⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    """
+    style = "bold green"
+    console.print(baby_yoda_ascii_art, style=style)
+
+    panel = Panel.fit("Greeting you, my young padawan!", title="My name is baby youda :)", border_style="green")
+    console.print(panel)    
+    
     
     while True:
         user_input = get_user_input()
@@ -678,6 +741,10 @@ def main():
             print(edit_email_for_contact(args, address_book))
         elif command == "add-address":                              # Address
             print(add_address_to_contact(args, address_book))
+        elif command == "edit-address":
+            print(edit_address_for_contact(args, address_book))
+        elif command == "remove-address":
+            print(remove_address_from_contact(args, address_book))
         elif command == 'help':
             display_help()
         elif command == "add-note":                           # NOTES specific command
