@@ -36,7 +36,6 @@ class Email(Field):
             print("Invalid email format.")
         super().__init__(value)
 
-
 class Birthday(Field):
     def __init__(self, value):
         if not re.match(r'\d{2}\.\d{2}\.\d{4}', value):
@@ -50,6 +49,7 @@ class Record:
         self.emails = []
         self.birthday = None
         self.email = None
+
 
     def add_phone(self, phone):
         new_phone = Phone(phone)
@@ -67,6 +67,7 @@ class Record:
             if str(p) == phone:
                 return p
         return None
+
 
     #Додано методи для Email
     def add_email(self, email):
@@ -94,6 +95,7 @@ class Record:
         emails_str = ', '.join(map(str, self.emails))
         birthday_str = str(self.birthday) if self.birthday else ""
         return f"Contact name: {self.name}, phones: {phones_str}, emails: {emails_str}, birthday: {birthday_str}"
+
 
 
 class AddressBook:
@@ -150,7 +152,6 @@ def load_contacts(address_book, filename="contacts.txt"):
     except FileNotFoundError:
         pass
 
-
 # Виведення усіх контактів
 @input_error
 def list_contacts(address_book):
@@ -186,7 +187,21 @@ def add_contact(args, address_book):
         return "Contact added."
     else:
         raise ValueError("Give me name and phone please. Use add <name> <phone number>")
-    
+
+# Зміна номера телефону
+@input_error
+def change_contact(args, address_book):
+    if len(args) == 2:
+        name, new_phone = args
+        record = address_book.find(name)
+        if record:
+            record.edit_phone(record.phones[0].value, new_phone)
+            return f"Phone number for {name} changed to {new_phone}."
+        else:
+            raise KeyError
+    else:
+        raise ValueError("Give me name and new phone please.")
+
 # Пошук контактів 
 def find_contact(args, address_book):
     if len(args) == 1:
@@ -198,7 +213,7 @@ def find_contact(args, address_book):
             return f"Contact '{name}' not found."
     else:
         raise ValueError("Give me a name to find.")
-    
+
 # Видалення контактів
 @input_error
 def delete_contact(args, address_book):
@@ -223,6 +238,7 @@ def change_contact(args, address_book):
             raise KeyError
     else:
         raise ValueError("Give me name and new phone please.")
+
 
 # Додавання номера для існуючого контакту
 @input_error
@@ -265,7 +281,7 @@ def edit_phone_for_contact(args, address_book):
             raise KeyError
     else:
         raise ValueError("Give me name, old phone, and new phone please.")
-    
+
 # Пошук контактів за номером телефона
 def find_by_phone(args, address_book):
     if len(args) == 1:
@@ -458,6 +474,8 @@ def main():
             print(remove_phone_from_contact(args, address_book))
         elif command == "edit-phone":
             print(edit_phone_for_contact(args, address_book))
+        elif command == "findphone":
+            print(find_by_phone(args, address_book))
         elif command == "add-birthday":
             print(add_birthday_to_contact(args, address_book))
         elif command == "show-birthday":
