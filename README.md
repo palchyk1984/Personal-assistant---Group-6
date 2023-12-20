@@ -8,33 +8,28 @@ For correct work of this application before launching a code you have to install
         #TBD for windows
     4. pip3 install -r requirements.txt
 
-    Coommands:
-
-    - help - display all comands                   
-    - hello - greeting message
-
-    Address book:
-
-    Search:
-    - "all" - show all contacts 
-    - find - search by contact name
-    - find-phone - search contact by phone number
-    - birthdays - show upcoming birthdays
-    - contact-birthday - show birthday of a contact
-
-    Add new:
-    - add - add new contact
-    - add-phone - add phone number to an existing contact
-    - add-email - add email to an existing contact
-    - add-birthday - add birthday to an existing contact
-    - add-address - add address for an existing contact
-
-    Edit:
-    - editphone - edit phone number for an existing contact
-    - remove phone - remove phone number from an existing contact
-    - remove email - remove emailr from an existing contact
-    - del contact - delete contact record from database
-
+```
+    'Main commands:
+        'hello - greeting message'
+        'all - show all contacts'
+        'find - number search by name'
+        'find-phone - search contacts by phone number\n'
+        'add - add new contact\\contact number\n'
+        'change - change contact number\n'
+        'add-phone - add phone number to an existing contact\n'
+        'remove-phone - remove phone number from an existing contact\n'
+        'edit-phone - edit phone number for an existing contact\n'
+        'add-email - add email to an existing contact\n'
+        'remove-email - remove email from an existing contact\n'  
+        'edit-email - edit email for an existing contact\n'  
+        'add-birthday - add birthday to an existing contact\n'
+        'show-birthday - show birthday of a contact\n'
+        'birthdays - show upcoming birthdays\n'
+        'add-address add address for an existing contact\n'
+        'del - delete contact\\number\n'
+        'help - display all comands  from menu\n'
+        'close/exit - save added contacts/notes and finish work
+```
     Notebook
 
     - all-notes - show all notes
