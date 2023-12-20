@@ -606,6 +606,7 @@ def display_help():
         "Email": ["add-email - add email to an existing contact", "remove-email - remove email from an existing contact", "edit-email - edit email for an existing contact"],
         "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", "birthdays - show upcoming birthdays"],
         "Address": ["add-address - add address for an existing contact"],
+        "Notes": ["add-note - addin note", "all-notes - display all notes"],
     }
 
     for category, commands in categories.items():
