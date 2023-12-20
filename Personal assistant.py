@@ -114,6 +114,58 @@ class AddressBook:
         if name in self.data:
             del self.data[name]
 
+# Notes specific Classes
+
+class Tag(Field):                   
+    def __init__(self, value):
+        if not value.isdigit() or len(value) > 10:
+            raise ValueError("Tag should be max 10 digits")
+        super().__init__(value)
+
+class Timestamp():                 
+    def __init__(self):
+        self.ts = datetime.now()
+
+    def __str__(self):
+        return str(self.ts)
+
+class Note(Field):                   
+    def __init__(self, value):
+        if len(value) > 255:
+            raise ValueError("Note should be max 255 digits")
+        super().__init__(value)
+
+class NoteRecord:
+    def __init__(self, note: Note):
+        self.timestamp = Timestamp()
+        self.tags = []
+        self.note = note
+
+    def __str__(self):
+            return f"Note from: {self.timestamp}\n Text: {self.note}\n Tags: {self.tags}\n"
+    
+class NoteBook:
+    def __init__(self):
+        self.data = {}
+
+    def add_record(self, note_record):
+        self.data[note_record.timestamp.ts] = note_record
+
+    def show_all_notes(self):
+        for note_record in self.data.values():
+            print(note_record)
+    
+    def find_note_day(self, day):
+        notes_list_day = []
+        for timesnap in self.data:
+            if timesnap.ts.day == day:
+                notes_list_day = notes_list_day.append(self.data.get(timesnap)) 
+        return notes_list_day
+
+    def delete(self, name):
+        if name in self.data:
+            del self.data[name]
+
 # Розділення введеного рядка на команду та аргументи
 def parse_input(user_input):
     cmd, *args = user_input.split()
