@@ -1,9 +1,3 @@
-# Chagelog for bot version 0.6:
-# - added functions for 
-# - - add-birthday - add birthday to an existing contact
-# - - show-birthday - show birthday of a contact
-# - - birthdays - show upcoming birthdays
-
 import re
 from datetime import datetime, timedelta
 from collections import defaultdict
@@ -96,6 +90,10 @@ class Record:
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
+
+    def edit_birthday(self, new_birthday):
+        self.birthday = Birthday(new_birthday)
+
     #Методи для Adsress
     def add_address(self, address):
         new_address = Address(address)
@@ -109,6 +107,7 @@ class Record:
     def edit_address(self, old_address, new_address):
         self.remove_address(old_address)
         self.add_address(new_address)
+
 
     def __str__(self):
         phones_str = ', '.join(map(str, self.phones))
@@ -143,12 +142,13 @@ class Tag(Field):
             raise ValueError("Tag should be max 10 characters")
         super().__init__(value)
 
+
     def __str__(self):
         return str(self.value)
 
 class Timestamp():                 
-    def __init__(self, ID = 0):
-        self.ts = datetime.now()
+    def __init__(self, ID = 0, ts = datetime.now()):
+        self.ts = ts
         self.ID = ID
 
     def increment_ID(self):
@@ -167,7 +167,7 @@ class Note(Field):
 class NoteRecord:
     def __init__(self, note: Note, note_name=""):
         self.timestamp = Timestamp()
-        self.tags = []
+        self.tags = ['no']
         self.note = note
         self.note_name = note_name
 
@@ -242,7 +242,23 @@ def load_contacts(address_book, filename="contacts.txt"):
         pass
 
 
-notebook = NoteBook()     # temporary initiallization of notebook later will be changed to reading from file
+# Завантаження ноутів з текстового файлу
+@input_error
+def load_notes(notebook, filename="notebook.txt"):
+    try:
+        with open(filename, "r") as file:
+            for line in file:
+                timestamp_ts_str, timestamp_ID_str, tags_str, note_str = line.strip().split("_")
+                #tags = tags_str.split(";")
+                note = Note(note_str)
+                time_stamp = Timestamp(int(timestamp_ID_str), datetime.strptime(timestamp_ts_str, '%Y-%m-%d %H:%M:%S.%f'))
+                note_record = NoteRecord(note)
+                note_record.timestamp = time_stamp
+                #note_record.tags = tags
+                notebook.add_record_notebook(note_record)
+
+    except FileNotFoundError:
+        pass
 
 # Виведення усіх контактів
 @input_error
@@ -447,6 +463,21 @@ def add_birthday_to_contact(args, address_book):
             raise KeyError
     else:
         raise ValueError("Give me name and birthday (DD.MM.YYYY) please.")
+
+# Редагування дня народження контакту
+@input_error
+def edit_birthday_for_contact(args, address_book):
+    if len(args) == 2:
+        name, new_birthday = args
+        record = address_book.find(name)
+        if record:
+            old_birthday = record.birthday.value if record.birthday else None
+            record.edit_birthday(new_birthday)
+            return f"Birthday for {name} edited. Old birthday {old_birthday} replaced by new birthday: {new_birthday}."
+        else:
+            raise KeyError
+    else:
+        raise ValueError("Give me name and new birthday (DD.MM.YYYY) please.")
     
 # Показ дня народження контакту
 @input_error
@@ -546,6 +577,13 @@ def get_user_input():
     completer = WordCompleter(get_valid_commands(), ignore_case=True)
     return prompt("Enter command: ", completer=completer)
 
+# Збереження ноутів у текстовий файл  
+@input_error
+def save_notes(notebook, filename="notebook.txt"):
+    with open(filename, "w") as file:
+        for noterecord in notebook.data.values():
+            tags_str = ';'.join(map(str, noterecord.tags)) if noterecord.tags else ""
+            file.write(f"{noterecord.timestamp.ts}_{noterecord.timestamp.ID}_{tags_str}_{noterecord.note}\n")
 
 # POPUP
 # Меню Help
@@ -572,6 +610,7 @@ def display_help():
                      'edit-email - edit email for an existing contact\n'
                      '\nBirthday:\n'
                      'add-birthday - add birthday to an existing contact\n'
+                     'edit-birthday - edit birthday of an existing contact\n'
                      'show-birthday - show birthday of a contact\n'
                      'birthdays - show upcoming birthdays\n'
                      '\nAddress:\n'
@@ -584,7 +623,9 @@ def display_help():
 # Команди бота
 def main():
     address_book = AddressBook()
+    notebook = NoteBook()
     load_contacts(address_book)
+    load_notes(notebook)
     display_help() 
     
     print("Greeting you, my young padawan!")
@@ -600,6 +641,7 @@ def main():
 
         if command in ["close", "exit"]:
             save_contacts(address_book)
+            save_notes(notebook)
             print("Goodbye!")
             break
         elif command == "hello":
@@ -622,6 +664,8 @@ def main():
             print(find_by_phone(args, address_book))
         elif command == "add-birthday":                             # Happy BD
             print(add_birthday_to_contact(args, address_book))
+        elif command == "edit-birthday":
+            print(edit_birthday_for_contact(args, address_book))
         elif command == "show-birthday":
             print(show_birthday(args, address_book))
         elif command == "birthdays":
@@ -636,12 +680,15 @@ def main():
             print(add_address_to_contact(args, address_book))
         elif command == 'help':
             display_help()
-        elif command == "add-note":                                 # NOTES specific commands start
+        elif command == "add-note":                           # NOTES specific command
             print(add_record_notebook(args, notebook))
         elif command == "all-notes":                         
-            notebook.show_all_notes()
+            notebook.show_all_notes()                          # NOTES specific command
         else:
             print("Invalid command.")
 
 if __name__ == "__main__":
     main()
+
+
+
