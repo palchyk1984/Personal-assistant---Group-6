@@ -29,6 +29,14 @@ class Phone(Field):
             raise ValueError("Phone number format should be max 10 digits")
         super().__init__(value)
 
+# Додано класс для Email
+class Email(Field):
+    def __init__(self, value):
+        if not is_valid_email(value):
+            print("Invalid email format.")
+        super().__init__(value)
+
+
 class Birthday(Field):
     def __init__(self, value):
         if not re.match(r'\d{2}\.\d{2}\.\d{4}', value):
@@ -39,7 +47,9 @@ class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
+        self.emails = []
         self.birthday = None
+        self.email = None
 
     def add_phone(self, phone):
         new_phone = Phone(phone)
@@ -58,11 +68,33 @@ class Record:
                 return p
         return None
 
+    #Додано методи для Email
+    def add_email(self, email):
+        new_email = Email(email)
+        self.emails.append(new_email)
+
+    def remove_email(self, email):
+        self.emails = [e for e in self.emails if str(e) != email]
+
+    def edit_email(self, old_email, new_email):
+        self.remove_email(old_email)
+        self.add_email(new_email)
+
+    def find_email(self, email):
+        for e in self.emails:
+            if str(e) == email:
+                return e
+        return None
+
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
     def __str__(self):
-        return f"Contact name: {self.name}, phones: {', '.join(map(str, self.phones))}, birthday: {self.birthday}"
+        phones_str = ', '.join(map(str, self.phones))
+        emails_str = ', '.join(map(str, self.emails))
+        birthday_str = str(self.birthday) if self.birthday else ""
+        return f"Contact name: {self.name}, phones: {phones_str}, emails: {emails_str}, birthday: {birthday_str}"
+
 
 class AddressBook:
     def __init__(self):
@@ -104,16 +136,20 @@ def load_contacts(address_book, filename="contacts.txt"):
     try:
         with open(filename, "r") as file:
             for line in file:
-                name, phones_str, birthday_str = line.strip().split(":")
+                name, phones_str, emails_str, birthday_str = line.strip().split(":")
                 phones = phones_str.split(";")
+                emails = emails_str.split(";") if emails_str else []
                 record = Record(name)
                 for phone in phones:
                     record.add_phone(phone)
+                for email in emails:
+                    record.add_email(email)
                 if birthday_str:
                     record.add_birthday(birthday_str)
                 address_book.add_record(record)
     except FileNotFoundError:
         pass
+
 
 # Виведення усіх контактів
 @input_error
@@ -123,18 +159,22 @@ def list_contacts(address_book):
     else:
         table = Table(title="All Contacts")
         table.add_column("Name 👤", style="cyan", justify="left")
-        table.add_column("Phones 📞 ", style="magenta", justify="center")
+        table.add_column("Phones 📞", style="magenta", justify="center")
+        table.add_column("Emails 📧", style="yellow", justify="center")  # Нова колонка для виведення електронних адрес
         table.add_column("Birthday 🎂", style="green", justify="center")
 
         for record in address_book.data.values():
             phone_str = ', '.join([f"[cyan]{phone}[/cyan]" for phone in record.phones])
+            email_str = ', '.join([f"[yellow]{email}[/yellow]" for email in record.emails])  # Додаємо виведення електронних адрес
             birthday_str = str(record.birthday) if record.birthday else ""
-            table.add_row(record.name.value, phone_str, birthday_str)
+            table.add_row(record.name.value, phone_str, email_str, birthday_str)
 
         console.print(table)
 
     return ""
 
+
+# CONTACT
 # Додавання контакту
 @input_error
 def add_contact(args, address_book):
@@ -146,7 +186,30 @@ def add_contact(args, address_book):
         return "Contact added."
     else:
         raise ValueError("Give me name and phone please. Use add <name> <phone number>")
+    
+# Пошук контактів 
+def find_contact(args, address_book):
+    if len(args) == 1:
+        name = args[0]
+        record = address_book.find(name)
+        if record:
+            return f"Phone number(s) for {name}: {', '.join(map(str, record.phones))}, birthday: {record.birthday}."
+        else:
+            return f"Contact '{name}' not found."
+    else:
+        raise ValueError("Give me a name to find.")
+    
+# Видалення контактів
+@input_error
+def delete_contact(args, address_book):
+    if len(args) == 1:
+        name = args[0]
+        address_book.delete(name)
+        return f"Contact {name} deleted."
+    else:
+        raise ValueError("Give me a name to delete.")
 
+# PHONE NUMBER
 # Зміна номера телефону
 @input_error
 def change_contact(args, address_book):
@@ -160,28 +223,6 @@ def change_contact(args, address_book):
             raise KeyError
     else:
         raise ValueError("Give me name and new phone please.")
-
-# Пошук контактів 
-def find_contact(args, address_book):
-    if len(args) == 1:
-        name = args[0]
-        record = address_book.find(name)
-        if record:
-            return f"Phone number(s) for {name}: {', '.join(map(str, record.phones))}, birthday: {record.birthday}."
-        else:
-            return f"Contact '{name}' not found."
-    else:
-        raise ValueError("Give me a name to find.")
-
-# Видалення контактів
-@input_error
-def delete_contact(args, address_book):
-    if len(args) == 1:
-        name = args[0]
-        address_book.delete(name)
-        return f"Contact {name} deleted."
-    else:
-        raise ValueError("Give me a name to delete.")
 
 # Додавання номера для існуючого контакту
 @input_error
@@ -224,7 +265,7 @@ def edit_phone_for_contact(args, address_book):
             raise KeyError
     else:
         raise ValueError("Give me name, old phone, and new phone please.")
-
+    
 # Пошук контактів за номером телефона
 def find_by_phone(args, address_book):
     if len(args) == 1:
@@ -240,6 +281,53 @@ def find_by_phone(args, address_book):
     else:
         raise ValueError("Give me a phone number to find.")
     
+# EMAIL
+# Додамо нові функції для обробки email
+
+def is_valid_email(email):
+    return re.match(r'\S+@\S+\.\S+', email) is not None
+
+def add_email_to_contact(args, address_book):
+    if len(args) == 2:
+        name, new_email = args
+        record = address_book.find(name)
+        if record:
+            if is_valid_email(new_email):
+                record.add_email(new_email)
+                return f"Email {new_email} added to {name}."
+            else:
+                return "Invalid email format."
+        else:
+            return "Contact not found."
+    else:
+        return "Give me name and new email please."
+    return ""
+
+def remove_email_from_contact(args, address_book):
+    if len(args) == 2:
+        name, old_email = args
+        record = address_book.find(name)
+        if record:
+            record.remove_email(old_email)
+            return f"Email {old_email} removed from {name}."
+        else:
+            raise KeyError
+    else:
+        raise ValueError("Give me name and email to remove please.")
+
+def edit_email_for_contact(args, address_book):
+    if len(args) == 3:
+        name, old_email, new_email = args
+        record = address_book.find(name)
+        if record:
+            record.edit_email(old_email, new_email)
+            return f"Email {old_email} for {name} edited to {new_email}."
+        else:
+            raise KeyError
+    else:
+        raise ValueError("Give me name, old email, and new email please.")
+    
+# HAPPY BD
 #Додавання дня народження
 @input_error
 def add_birthday_to_contact(args, address_book):
@@ -298,16 +386,19 @@ def show_upcoming_birthdays(address_book):
         names_to_congratulate = ', '.join(el[1])
         print(f'{days_of_week[el[0]]}: {names_to_congratulate}')
 
-
+# DATABASE
 # Збереження контактів у текстовий файл  
 @input_error
 def save_contacts(address_book, filename="contacts.txt"):
     with open(filename, "w") as file:
         for record in address_book.data.values():
+            email_str = ';'.join(map(str, record.emails)) if record.emails else ""
             birthday_str = str(record.birthday) if record.birthday else ""
-            file.write(f"{record.name.value}:{';'.join(map(str, record.phones))}:{birthday_str}\n")
+            file.write(f"{record.name.value}:{';'.join(map(str, record.phones))}:{email_str}:{birthday_str}\n")
 
-# Меню
+
+# POPUP
+# Меню Help
 def display_help():
     print('-' * 45 + '\nMain commands:\n'
                      'hello - greeting message\n'
@@ -319,6 +410,9 @@ def display_help():
                      'add-phone - add phone number to an existing contact\n'
                      'remove-phone - remove phone number from an existing contact\n'
                      'editphone - edit phone number for an existing contact\n'
+                     'add-email - add email to an existing contact\n'  # Додана команда
+                     'remove-email - remove email from an existing contact\n'  # Додана команда
+                     'editemail - edit email for an existing contact\n'  # Додана команда
                      'add-birthday - add birthday to an existing contact\n'
                      'show-birthday - show birthday of a contact\n'
                      'birthdays - show upcoming birthdays\n'
@@ -329,7 +423,8 @@ def display_help():
 # Команди бота
 def main():
     address_book = AddressBook()
-    load_contacts(address_book)  # Додайте цей рядок
+    load_contacts(address_book)  
+    
     print("Greeting you, my young padawan!")
     
     while True:
@@ -363,14 +458,18 @@ def main():
             print(remove_phone_from_contact(args, address_book))
         elif command == "edit-phone":
             print(edit_phone_for_contact(args, address_book))
-        elif command == "findphone":
-            print(find_by_phone(args, address_book))
         elif command == "add-birthday":
             print(add_birthday_to_contact(args, address_book))
         elif command == "show-birthday":
             print(show_birthday(args, address_book))
         elif command == "birthdays":
             show_upcoming_birthdays(address_book)
+        elif command == "add-email":
+            print(add_email_to_contact(args, address_book))
+        elif command == "remove-email":
+            print(remove_email_from_contact(args, address_book))
+        elif command == "editemail":
+            print(edit_email_for_contact(args, address_book))
         elif command == 'help':
             display_help()
         else:
