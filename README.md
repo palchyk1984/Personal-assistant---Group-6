@@ -38,10 +38,15 @@ Address book
 
 Notebook
 
-    - all notes - show all notes
-    - new note - add new note
-    - Add tag - add tag to existing note
-    - Edit note - edit note description
+- all-notes - show all notes
+- notes-day - show note per day
+- notes-month - show notes per month
+- notes-year - show notes per year
+- find-ID - search note by ID
+- new-note - add new note
+- add-tag - add tag to existing note
+- edit-note - edit note description
+- delete-note - delete specific note
     
 
                  _.' :  `._
