@@ -139,16 +139,19 @@ class AddressBook:
 
 class Tag(Field):                   
     def __init__(self, value):
-        if not value.isdigit() or len(value) > 10:
-            raise ValueError("Tag should be max 10 digits")
+        if len(value) > 10:
+            raise ValueError("Tag should be max 10 characters")
         super().__init__(value)
+
+    def __str__(self):
+        return str(self.value)
 
 class Timestamp():                 
     def __init__(self, ID = 0):
         self.ts = datetime.now()
         self.ID = ID
 
-    def ID(self):
+    def increment_ID(self):
         self.ID += 1
     
 
@@ -158,17 +161,19 @@ class Timestamp():
 class Note(Field):                   
     def __init__(self, value):
         if len(value) > 255:
-            raise ValueError("Note should be max 255 digits")
+            raise ValueError("Note should be max 255 symbols")
         super().__init__(value)
 
 class NoteRecord:
-    def __init__(self, note: Note):
+    def __init__(self, note: Note, note_name=""):
         self.timestamp = Timestamp()
         self.tags = []
         self.note = note
+        self.note_name = note_name
 
     def __str__(self):
-            return f"Note from: {self.timestamp}\n Text: {self.note}\n Tags: {self.tags}\n"
+        tags_str = ', '.join(map(str, self.tags))
+        return f"Note from: {self.timestamp}\n Name: {self.note_name}\n Text: {self.note}\n Tags: {tags_str}\n"
     
 class NoteBook:
     def __init__(self):
@@ -188,9 +193,9 @@ class NoteBook:
                 notes_list_day = notes_list_day.append(self.data.get(timesnap)) 
         return notes_list_day
 
-    def delete(self, name):
-        if name in self.data:
-            del self.data[name]
+    def delete(self, timestamp):
+        if timestamp in self.data:
+            del self.data[timestamp]
 
 # Розділення введеного рядка на команду та аргументи
 def parse_input(user_input):
@@ -491,7 +496,21 @@ def show_upcoming_birthdays(address_book):
 # processing user input funtions
 
 def add_record_notebook(args, notebook):
-    notebook.add_record_notebook(NoteRecord(' '.join(args)))
+        # Запит ім'я нотатки
+    note_name = input("Enter Note name: ")
+    
+    # Запит тексту нотатки
+    note_text = input("Enter Note text: ")
+    
+    # Запит тегів
+    tags_input = input("Enter tags (comma-separated, press Enter to skip): ")
+    tags = [Tag(tag.strip()) for tag in tags_input.split(",") if tag.strip()]  # Розділити теги та видалити порожні
+
+    note = Note(note_text)
+    note_record = NoteRecord(note, note_name=note_name)
+    note_record.tags = tags
+    
+    notebook.add_record_notebook(note_record)
     
     return 'Note added to the notebook'
 
@@ -514,7 +533,7 @@ def get_valid_commands():
         "close", "exit", "hello", "add", "all", "find",
         "del", "add-phone", "remove-phone", "edit-phone", "find-phone",
         "add-birthday", "show-birthday", "birthdays", "help", "add-email",
-
+        "add-note", "all-notes",
         "remove-email", "edit-email", "add-address"
     ]
 
@@ -556,7 +575,10 @@ def display_help():
                      'show-birthday - show birthday of a contact\n'
                      'birthdays - show upcoming birthdays\n'
                      '\nAddress:\n'
-                     'add-address add address for an existing contact\n' + '-' * 45)
+                     'add-address add address for an existing contact\n'
+                     '\nNotes:\n'
+                     'add-note - addin note\n'
+                     'all-notes - display all notes\n' + '-' * 45)
 
 
 # Команди бота
