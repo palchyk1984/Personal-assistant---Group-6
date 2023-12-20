@@ -10,7 +10,8 @@ from prompt_toolkit.completion import WordCompleter
 
 console = Console()
 
-# Classes
+## Classes
+
 class Field:
     def __init__(self, value):
         self.value = value
@@ -27,7 +28,6 @@ class Phone(Field):
             raise ValueError("Phone number format should be max 10 digits")
         super().__init__(value)
 
-# Додано класс для Email
 class Email(Field):
     def __init__(self, value):
         if not is_valid_email(value):
@@ -51,7 +51,8 @@ class Record:
         self.addresses = []
         self.birthday = None
 
-    #Методи для Phone
+    # Phone
+        
     def add_phone(self, phone):
         new_phone = Phone(phone)
         self.phones.append(new_phone)
@@ -69,8 +70,8 @@ class Record:
                 return p
         return None
 
+    # Email
 
-    #Методи для Email
     def add_email(self, email):
         new_email = Email(email)
         self.emails.append(new_email)
@@ -88,28 +89,26 @@ class Record:
                 return e
         return None
     
-    #Методи для Birthday
+    # Birthday
+
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
-
 
     def edit_birthday(self, new_birthday):
         self.birthday = Birthday(new_birthday)
 
-    #Методи для Adsress
+    # Adsress
+        
     def add_address(self, address):
         new_address = Address(address)
         self.addresses.append(new_address)
 
-     #Метод remove_address
     def remove_address(self, address):
         self.addresses = [a for a in self.addresses if str(a) != address]
 
-    # Метод edit_address
     def edit_address(self, old_address, new_address):
         self.remove_address(old_address)
         self.add_address(new_address)
-
 
     def __str__(self):
         phones_str = ', '.join(map(str, self.phones))
@@ -150,7 +149,6 @@ class Notename(Field):
             raise ValueError("Note name should be max 20 digits")
         super().__init__(value)
 
-
 class Timestamp():                 
     def __init__(self, ID = 0, ts = datetime.now()):
         self.ts = ts
@@ -159,7 +157,6 @@ class Timestamp():
     def ID(self):
         self.ID += 1
     
-
     def __str__(self):
         return f'{self.ts} ID: {self.ID}'
 
@@ -214,9 +211,9 @@ def input_error(func):
         except ValueError as e:
             return str(e)
         except KeyError:
-            return "Contact not found." #Traceback !
+            return "Contact not found."
         except IndexError:
-            return "Invalid command format." #Traceback !
+            return "Invalid command format."
 
     return inner
 
@@ -263,7 +260,7 @@ def load_notes(notebook, filename="notebook.txt"):
     except FileNotFoundError:
         pass
 
-# Виведення усіх контактів
+## VIEW All Contacts
 @input_error
 def list_contacts(address_book):
     if not address_book.data:
@@ -288,7 +285,7 @@ def list_contacts(address_book):
     return ""
 
 
-# CONTACT
+## CONTACT
 # Додавання контакту
 @input_error
 def add_contact(args, address_book):
@@ -323,7 +320,7 @@ def delete_contact(args, address_book):
     else:
         raise ValueError("Give me a name to delete.")
 
-# PHONE NUMBER
+## PHONE NUMBER
 # Додавання номера для існуючого контакту
 @input_error
 def add_phone_to_contact(args, address_book):
@@ -381,7 +378,7 @@ def find_by_phone(args, address_book):
     else:
         raise ValueError("Give me a phone number to find.")
     
-# EMAIL
+## EMAIL
 # Email validation
 def is_valid_email(email):
     return re.match(r'\S+@\S+\.\S+', email) is not None
@@ -405,7 +402,7 @@ def add_email_to_contact(args, address_book):
         raise ValueError ("Give me name and new email please.")
     return ""
 
-#Remove Email
+# Remove Email
 @input_error
 def remove_email_from_contact(args, address_book):
     if len(args) == 2:
@@ -432,7 +429,7 @@ def edit_email_for_contact(args, address_book):
     else:
         raise ValueError("Give me name, old email, and new email please.")
 
-# ADDRESS
+## ADDRESS
 # Add address
 @input_error    
 def add_address_to_contact(args, address_book):
@@ -451,8 +448,21 @@ def add_address_to_contact(args, address_book):
         raise ValueError("Give me name and new address please.")
     return ""
 
+@input_error
+def remove_address_from_contact(args, address_book):
+    if len(args) == 2:
+        name, address = args
+        record = address_book.find(name)
+        if record:
+            record.remove_address(address)
+            return f"Address {address} removed from {name}."
+        else:
+            raise KeyError 
+    else:
+        raise ValueError("Give me name and address to remove please.")
 
-# HAPPY BD
+
+## HAPPY BD
 #Додавання дня народження
 @input_error
 def add_birthday_to_contact(args, address_book):
@@ -526,7 +536,7 @@ def show_upcoming_birthdays(address_book):
         names_to_congratulate = ', '.join(el[1])
         print(f'{days_of_week[el[0]]}: {names_to_congratulate}')
 
-# NOTES 
+## NOTES 
 # processing user input funtions
 
 def add_record_notebook(args, notebook):
@@ -535,7 +545,7 @@ def add_record_notebook(args, notebook):
     return 'Note added to the notebook'
 
 
-# DATABASE
+## DATABASE
 # Збереження контактів у текстовий файл  
 @input_error
 def save_contacts(address_book, filename="contacts.txt"):
@@ -553,8 +563,8 @@ def get_valid_commands():
         "close", "exit", "hello", "add", "all", "find",
         "del", "add-phone", "remove-phone", "edit-phone", "find-phone",
         "add-birthday", "show-birthday", "birthdays", "help", "add-email",
-
-        "remove-email", "edit-email", "add-address"
+        "remove-email", "edit-email", 
+        "add-address",  "remove-address"
     ]
 
     # Add dynamically generated commands based on the address book data
@@ -698,6 +708,8 @@ def main():
             print(edit_email_for_contact(args, address_book))
         elif command == "add-address":                              # Address
             print(add_address_to_contact(args, address_book))
+        elif command == "remove-address":
+            print(remove_address_from_contact(args, address_book))
         elif command == 'help':
             display_help()
         elif command == "add-note":                           # NOTES specific command
