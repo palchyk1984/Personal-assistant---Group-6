@@ -61,6 +61,9 @@ class Record:
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
+    def edit_birthday(self, new_birthday):
+        self.birthday = Birthday(new_birthday)
+
     def __str__(self):
         return f"Contact name: {self.name}, phones: {', '.join(map(str, self.phones))}, birthday: {self.birthday}"
 
@@ -253,6 +256,21 @@ def add_birthday_to_contact(args, address_book):
             raise KeyError
     else:
         raise ValueError("Give me name and birthday (DD.MM.YYYY) please.")
+
+# Редагування дня народження контакту
+@input_error
+def edit_birthday_for_contact(args, address_book):
+    if len(args) == 2:
+        name, new_birthday = args
+        record = address_book.find(name)
+        if record:
+            old_birthday = record.birthday.value if record.birthday else None
+            record.edit_birthday(new_birthday)
+            return f"Birthday for {name} edited. Old birthday {old_birthday} replaced by new birthday: {new_birthday}."
+        else:
+            raise KeyError
+    else:
+        raise ValueError("Give me name and new birthday (DD.MM.YYYY) please.")
     
 # Показ дня народження контакту
 @input_error
@@ -320,6 +338,7 @@ def display_help():
                      'remove-phone - remove phone number from an existing contact\n'
                      'editphone - edit phone number for an existing contact\n'
                      'add-birthday - add birthday to an existing contact\n'
+                     'edit-birthday - edit birthday of an existing contact\n'
                      'show-birthday - show birthday of a contact\n'
                      'birthdays - show upcoming birthdays\n'
                      'del - delete contact\\number\n'
@@ -367,6 +386,8 @@ def main():
             print(find_by_phone(args, address_book))
         elif command == "add-birthday":
             print(add_birthday_to_contact(args, address_book))
+        elif command == "edit-birthday":
+            print(edit_birthday_for_contact(args, address_book))
         elif command == "show-birthday":
             print(show_birthday(args, address_book))
         elif command == "birthdays":
