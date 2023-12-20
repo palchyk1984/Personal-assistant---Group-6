@@ -13,25 +13,24 @@ Coommands:
     - help - display all comands                   
     - hello - greeting message
 
-Address book 
+Address book:
 
     Search:
-    - all contact - show all contacts
-    - by name - search by contact name
-    - by phone number - search contact by phone number
+    - "all" - show all contacts 
+    - find - search by contact name
+    - find-phone - search contact by phone number
     - birthdays - show upcoming birthdays
     - contact-birthday - show birthday of a contact
 
     Add new:
-    - contact - add new contact
-
+    - add - add new contact
     - add-phone - add phone number to an existing contact
     - add-email - add email to an existing contact
     - add-birthday - add birthday to an existing contact
+    - add-address - add address for an existing contact
 
     Edit:
     - editphone - edit phone number for an existing contact
-    - change - change contact number ? 
     - remove phone - remove phone number from an existing contact
     - remove email - remove emailr from an existing contact
     - del contact - delete contact record from database
