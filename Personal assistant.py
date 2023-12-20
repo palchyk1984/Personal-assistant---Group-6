@@ -123,11 +123,16 @@ class Tag(Field):
         super().__init__(value)
 
 class Timestamp():                 
-    def __init__(self):
+    def __init__(self, ID = 0):
         self.ts = datetime.now()
+        self.ID = ID
+
+    def ID(self):
+        self.ID += 1
+    
 
     def __str__(self):
-        return str(self.ts)
+        return f'{self.ts} ID: {self.ID}'
 
 class Note(Field):                   
     def __init__(self, value):
@@ -148,8 +153,8 @@ class NoteBook:
     def __init__(self):
         self.data = {}
 
-    def add_record(self, note_record):
-        self.data[note_record.timestamp.ts] = note_record
+    def add_record_notebook(self, note_record):
+        self.data[note_record.timestamp] = note_record
 
     def show_all_notes(self):
         for note_record in self.data.values():
@@ -205,6 +210,8 @@ def load_contacts(address_book, filename="contacts.txt"):
                 address_book.add_record(record)
     except FileNotFoundError:
         pass
+
+notebook = NoteBook()     # temporary initiallization of notebook later will be changed to reading from file
 
 # Виведення усіх контактів
 @input_error
@@ -456,6 +463,15 @@ def show_upcoming_birthdays(address_book):
         names_to_congratulate = ', '.join(el[1])
         print(f'{days_of_week[el[0]]}: {names_to_congratulate}')
 
+# NOTES 
+# processing user input funtions
+
+def add_record_notebook(args, notebook):
+    notebook.add_record_notebook(NoteRecord(' '.join(args)))
+    
+    return 'Note added to the notebook'
+
+
 # DATABASE
 # Збереження контактів у текстовий файл  
 @input_error
@@ -563,6 +579,10 @@ def main():
             print(edit_email_for_contact(args, address_book))
         elif command == 'help':
             display_help()
+        elif command == "add-note":                           # NOTES specific commands start
+            print(add_record_notebook(args, notebook))
+        elif command == "all-notes":                         
+            notebook.show_all_notes()
         else:
             print("Invalid command.")
 
