@@ -275,21 +275,7 @@ def add_contact(args, address_book):
         address_book.add_record(record)
         return "Contact added."
     else:
-        raise ValueError("Give me name and phone please. Use add <name> <phone number>") #Traceback !
-
-# Зміна номера телефону
-@input_error
-def change_contact(args, address_book):
-    if len(args) == 2:
-        name, new_phone = args
-        record = address_book.find(name)
-        if record:
-            record.edit_phone(record.phones[0].value, new_phone)
-            return f"Phone number for {name} changed to {new_phone}."
-        else:
-            raise KeyError #Traceback !
-    else:
-        raise ValueError("Give me name and new phone please.") #Traceback !
+        raise ValueError("Give me name and phone please. Use add <name> <phone number>")
 
 # Пошук контактів 
 def find_contact(args, address_book):
@@ -301,7 +287,7 @@ def find_contact(args, address_book):
         else:
             return f"Contact '{name}' not found."
     else:
-        raise ValueError("Give me a name to find.") #Traceback !
+        raise ValueError("Give me a name to find.")
 
 # Видалення контактів
 @input_error
@@ -311,24 +297,9 @@ def delete_contact(args, address_book):
         address_book.delete(name)
         return f"Contact {name} deleted."
     else:
-        raise ValueError("Give me a name to delete.") #Traceback !
+        raise ValueError("Give me a name to delete.")
 
 # PHONE NUMBER
-# Зміна номера телефону
-@input_error
-def change_contact(args, address_book):
-    if len(args) == 2:
-        name, new_phone = args
-        record = address_book.find(name)
-        if record:
-            record.edit_phone(record.phones[0].value, new_phone)
-            return f"Phone number for {name} changed to {new_phone}."
-        else:
-            raise KeyError #Traceback !
-    else:
-        raise ValueError("Give me name and new phone please.") #Traceback !
-
-
 # Додавання номера для існуючого контакту
 @input_error
 def add_phone_to_contact(args, address_book):
@@ -339,9 +310,9 @@ def add_phone_to_contact(args, address_book):
             record.add_phone(new_phone)
             return f"Phone number {new_phone} added to {name}."
         else:
-            raise KeyError #Traceback !
+            raise KeyError 
     else:
-        raise ValueError("Give me name and new phone please.") #Traceback !
+        raise ValueError("Give me name and new phone please.") 
 
 # Видалення номера для існуючого контакту
 @input_error
@@ -353,9 +324,9 @@ def remove_phone_from_contact(args, address_book):
             record.remove_phone(old_phone)
             return f"Phone number {old_phone} removed from {name}."
         else:
-            raise KeyError #Traceback !
+            raise KeyError 
     else:
-        raise ValueError("Give me name and phone to remove please.") #Traceback !
+        raise ValueError("Give me name and phone to remove please.") 
 
 # Редагування номера телефону для існуючого контакту
 @input_error
@@ -367,9 +338,9 @@ def edit_phone_for_contact(args, address_book):
             record.edit_phone(old_phone, new_phone)
             return f"Phone number {old_phone} for {name} edited to {new_phone}."
         else:
-            raise KeyError #Traceback !
+            raise KeyError
     else:
-        raise ValueError("Give me name, old phone, and new phone please.") #Traceback !
+        raise ValueError("Give me name, old phone, and new phone please.")
 
 # Пошук контактів за номером телефона
 def find_by_phone(args, address_book):
@@ -384,7 +355,7 @@ def find_by_phone(args, address_book):
         else:
             return f"No contacts found with phone number {phone}."
     else:
-        raise ValueError("Give me a phone number to find.")  #Traceback !
+        raise ValueError("Give me a phone number to find.")
     
 # EMAIL
 # Email validation
@@ -540,7 +511,7 @@ def save_contacts(address_book, filename="contacts.txt"):
 def get_valid_commands():
     address_book = AddressBook()
     commands = [
-        "close", "exit", "hello", "add", "all", "change", "find",
+        "close", "exit", "hello", "add", "all", "find",
         "del", "add-phone", "remove-phone", "edit-phone", "find-phone",
         "add-birthday", "show-birthday", "birthdays", "help", "add-email",
 
@@ -563,24 +534,29 @@ def get_user_input():
 def display_help():
     print('-' * 45 + '\nMain commands:\n'
                      'hello - greeting message\n'
+                     'help - display all comands  from menu\n'
+                     'close/exit - save added contacts/notes and finish work\n'
+                     '\nSearch:\n'
                      'all - show all contacts\n'
                      'find - number search by name\n'
                      'find-phone - search contacts by phone number\n'
-                     'add - add new contact\\contact number\n'
-                     'change - change contact number\n'
+                     '\nContact:\n'
+                     'add - add new contact\n'
+                     'del - delete contact\\number\n'
+                     '\nPhone:\n'
                      'add-phone - add phone number to an existing contact\n'
                      'remove-phone - remove phone number from an existing contact\n'
                      'edit-phone - edit phone number for an existing contact\n'
+                     '\nEmail:\n'
                      'add-email - add email to an existing contact\n'
                      'remove-email - remove email from an existing contact\n'  
-                     'edit-email - edit email for an existing contact\n'  
+                     'edit-email - edit email for an existing contact\n'
+                     '\nBirthday:\n'
                      'add-birthday - add birthday to an existing contact\n'
                      'show-birthday - show birthday of a contact\n'
                      'birthdays - show upcoming birthdays\n'
-                     'add-address add address for an existing contact\n'
-                     'del - delete contact\\number\n'
-                     'help - display all comands  from menu\n'
-                     'close/exit - save added contacts/notes and finish work\n' + '-' * 45)
+                     '\nAddress:\n'
+                     'add-address add address for an existing contact\n' + '-' * 45)
 
 
 # Команди бота
@@ -610,8 +586,6 @@ def main():
             print(add_contact(args, address_book))
         elif command == "all":
             print(list_contacts(address_book))
-        elif command == "change":
-            print(change_contact(args, address_book))
         elif command == "find":
             print(find_contact(args, address_book))
         elif command == "del":
