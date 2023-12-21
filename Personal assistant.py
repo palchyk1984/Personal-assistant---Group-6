@@ -146,18 +146,38 @@ class Tag(Field):
 
     def __str__(self):
         return str(self.value)
+    
+noteID = 0
 
 class Timestamp():                 
-    def __init__(self, ID = 0, ts = datetime.now()):
+    def __init__(self, noteID, ts):
         self.ts = ts
-        self.ID = ID
+        self.noteID = noteID
 
     def increment_ID(self):
-        self.ID += 1
+        self.noteID += 1
+    
+    def __eq__(self, other):
+        return self.ts == other.ts
+
+    def __ne__(self, other):
+        return self.ts != other.ts
+
+    def __lt__(self, other):
+        return self.ts < other.ts
+
+    def __gt__(self, other):
+        return self.ts > other.ts
+
+    def __le__(self, other):
+        return self.ts <= other.ts
+
+    def __ge__(self, other):
+        return self.ts >= other.ts
     
     def __str__(self):
-        return f'{self.ts} ID: {self.ID}'
-
+        return f'{self.ts} ID: {self.noteID}'
+    
 class Note(Field):                   
     def __init__(self, value):
         if len(value) > 255:
@@ -166,7 +186,9 @@ class Note(Field):
 
 class NoteRecord:
     def __init__(self, note: Note, note_name=""):
-        self.timestamp = Timestamp()
+        global noteID
+        noteID = noteID + 1
+        self.timestamp = Timestamp(noteID, datetime.now())
         self.tags = ['no']
         self.note = note
         self.note_name = note_name
@@ -180,7 +202,7 @@ class NoteBook:
         self.data = {}
 
     def add_record_notebook(self, note_record):
-        self.data[note_record.timestamp] = note_record
+        self.data[note_record.timestamp.ts] = note_record
 
     def show_all_notes(self):
         for note_record in self.data.values():
@@ -196,6 +218,9 @@ class NoteBook:
     def delete(self, timestamp):
         if timestamp in self.data:
             del self.data[timestamp]
+
+    def get_maxID(self):
+        return self.data[-1].noteID
 
 # Розділення введеного рядка на команду та аргументи
 def parse_input(user_input):
@@ -249,12 +274,12 @@ def load_notes(notebook, filename="notebook.txt"):
         with open(filename, "r") as file:
             for line in file:
                 timestamp_ts_str, timestamp_ID_str, tags_str, note_str = line.strip().split("_")
-                #tags = tags_str.split(";")
+                tags = tags_str.split(", ")
                 note = Note(note_str)
                 time_stamp = Timestamp(int(timestamp_ID_str), datetime.strptime(timestamp_ts_str, '%Y-%m-%d %H:%M:%S.%f'))
                 note_record = NoteRecord(note)
                 note_record.timestamp = time_stamp
-                #note_record.tags = tags
+                note_record.tags = tags
                 notebook.add_record_notebook(note_record)
 
     except FileNotFoundError:
@@ -624,8 +649,8 @@ def get_user_input():
 def save_notes(notebook, filename="notebook.txt"):
     with open(filename, "w") as file:
         for noterecord in notebook.data.values():
-            tags_str = ';'.join(map(str, noterecord.tags)) if noterecord.tags else ""
-            file.write(f"{noterecord.timestamp.ts}_{noterecord.timestamp.ID}_{tags_str}_{noterecord.note}\n")
+            tags_str = ', '.join(map(str, noterecord.tags)) if noterecord.tags else ""
+            file.write(f"{noterecord.timestamp.ts}_{noterecord.timestamp.noteID}_{tags_str}_{noterecord.note}\n")
 
 ## POPUP
 # Меню Help
@@ -666,6 +691,7 @@ def main():
     notebook = NoteBook()
     load_contacts(address_book)
     load_notes(notebook)
+    noteID = notebook.get_maxID
     display_help() 
     
     #print("Greeting you, my young padawan!")
