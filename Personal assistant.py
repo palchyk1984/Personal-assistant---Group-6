@@ -184,9 +184,12 @@ class Note(Field):
             raise ValueError("Note should be max 255 symbols")
         super().__init__(value)
 
-class NoteRecord:
+class NoteRecord():
+    
     def __init__(self, note: Note, note_name=""):
         global noteID
+        #super().__init__(noteID)
+        
         noteID = noteID + 1
         self.timestamp = Timestamp(noteID, datetime.now())
         self.tags = ['no']
@@ -221,6 +224,12 @@ class NoteBook:
 
     def get_maxID(self):
         return self.data[-1].noteID
+    
+    def find_ID(self, searchID):
+        for ts, note_record in self.data.items():
+            
+            if note_record.timestamp.noteID == searchID:
+                return note_record
 
 # Розділення введеного рядка на команду та аргументи
 def parse_input(user_input):
@@ -607,6 +616,11 @@ def add_record_notebook(args, notebook):
     
     return 'Note added to the notebook'
 
+def find_note_ID(args, notebook):
+    # Запит ID нотатки
+    note_ID = int(input("Enter Note ID: "))
+    
+    return notebook.find_ID(note_ID)
 
 ## DATABASE
 # Збереження контактів у текстовий файл  
@@ -777,6 +791,8 @@ def main():
             print(add_record_notebook(args, notebook))
         elif command == "all-notes":                         
             notebook.show_all_notes()                          # NOTES specific command
+        elif command == "find-note-id":                         
+            print(find_note_ID(args, notebook))                 # NOTES specific command  
         else:
             print("Invalid command.")
 

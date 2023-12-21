@@ -1,1 +1,1 @@
-load_cont
+global noteID
