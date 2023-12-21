@@ -218,9 +218,13 @@ class NoteBook:
                 notes_list_day = notes_list_day.append(self.data.get(timesnap)) 
         return notes_list_day
 
-    def delete(self, timestamp):
-        if timestamp in self.data:
-            del self.data[timestamp]
+    def delete(self, searchID):
+        for ts, note_record in self.data.items():
+            
+            if note_record.timestamp.noteID == searchID:
+                ts_to_delete = ts
+
+        return self.data.pop(ts_to_delete)
 
     def get_maxID(self):
         return self.data[-1].noteID
@@ -622,6 +626,12 @@ def find_note_ID(args, notebook):
     
     return notebook.find_ID(note_ID)
 
+def note_delete(args, notebook):
+    # Запит ID нотатки
+    note_ID = int(input("Enter Note ID: "))
+    
+    print(f'Note deleted:\n {notebook.delete(note_ID)}')
+
 ## DATABASE
 # Збереження контактів у текстовий файл  
 
@@ -789,10 +799,12 @@ def main():
             display_help()
         elif command == "add-note":                           # NOTES specific command
             print(add_record_notebook(args, notebook))
-        elif command == "all-notes":                         
-            notebook.show_all_notes()                          # NOTES specific command
-        elif command == "find-note-id":                         
-            print(find_note_ID(args, notebook))                 # NOTES specific command  
+        elif command == "all-notes":                          # NOTES specific command
+            notebook.show_all_notes()                          
+        elif command == "find-note-id":                       # NOTES specific command  
+            print(find_note_ID(args, notebook))
+        elif command == "note-del":                           # NOTES specific command  
+            note_delete(args, notebook)                
         else:
             print("Invalid command.")
 
