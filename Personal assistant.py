@@ -596,7 +596,7 @@ def show_upcoming_birthdays(address_book):
 
 ## NOTES 
 # processing user input funtions
-
+@input_error
 def add_record_notebook(args, notebook):
         # Запит ім'я нотатки
     note_name = input("Enter Note name: ")
@@ -615,12 +615,47 @@ def add_record_notebook(args, notebook):
     notebook.add_record_notebook(note_record)
     
     return 'Note added to the notebook'
-
+@input_error
 def find_note_ID(args, notebook):
     # Запит ID нотатки
     note_ID = int(input("Enter Note ID: "))
     
     return notebook.find_ID(note_ID)
+# Edit note
+@input_error
+def get_note_id_for_edit():
+    return int(input("Give me note ID to edit, please: "))
+
+# Edit note
+@input_error
+def edit_note(args, notebook):
+    note_id = get_note_id_for_edit()
+    note_record = notebook.find_ID(note_id)
+
+    if note_record:
+        # Display the note
+        print(f"Editing Note ID {note_id}:")
+        print(f"Name: {note_record.note_name}")
+        print(f"Text: {note_record.note}")
+        print(f"Tags: {', '.join(map(str, note_record.tags))}")
+
+        # Ask for changes
+        new_name = input("Enter new name (press Enter to skip): ")
+        new_text = input("Enter new text (press Enter to skip): ")
+        new_tags_input = input("Enter new tags (comma-separated, press Enter to skip): ")
+        new_tags = [Tag(tag.strip()) for tag in new_tags_input.split(",") if tag.strip()]
+
+        # Update the note if changes are provided
+        if new_name:
+            note_record.note_name = new_name
+        if new_text:
+            note_record.note = new_text
+        if new_tags:
+            note_record.tags = new_tags
+
+        return f"Note ID {note_id} edited successfully."
+    else:
+        raise ValueError(f"No note found with ID {note_id}.")
 
 ## DATABASE
 # Збереження контактів у текстовий файл  
@@ -646,7 +681,7 @@ def get_valid_commands():
         "add-birthday", "edit-birthday", "show-birthday", "birthdays",
         "add-email","remove-email", "edit-email", 
         "add-address", "edit-address" ,"remove-address",
-        "add-note", "all-notes"
+        "add-note", "all-notes", "edit-note", "find-note-ID"
     ]
 
     # Add dynamically generated commands based on the address book data
@@ -690,7 +725,7 @@ def display_help():
         "Email": ["add-email - add email to an existing contact", "remove-email - remove email from an existing contact", "edit-email - edit email for an existing contact"],
         "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", "birthdays - show upcoming birthdays"],
         "Address": ["add-address - add address for an existing contact","edit-address - edit address for an existing contact","remove-address - remove address for an existing contact" ],
-        "Notes": ["add-note - addin note", "all-notes - display all notes"],
+        "Notes": ["add-note - adding note", "edit-note - editing note", "find-note-ID - find note by given ID", "all-notes - display all notes"],
     }
 
     for category, commands in categories.items():
@@ -787,12 +822,14 @@ def main():
             print(remove_address_from_contact(args, address_book))
         elif command == 'help':
             display_help()
-        elif command == "add-note":                           # NOTES specific command
+        elif command == "add-note":                           # NOTES 
             print(add_record_notebook(args, notebook))
         elif command == "all-notes":                         
-            notebook.show_all_notes()                          # NOTES specific command
+            notebook.show_all_notes()                          
         elif command == "find-note-id":                         
-            print(find_note_ID(args, notebook))                 # NOTES specific command  
+            print(find_note_ID(args, notebook))                  
+        elif command == "edit-note":
+            print(edit_note(args, notebook))
         else:
             print("Invalid command.")
 
