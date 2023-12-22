@@ -523,12 +523,16 @@ def remove_address_from_contact(args, address_book):
 def add_birthday_to_contact(args, address_book):
     if len(args) == 2:
         name, birthday = args
-        record = address_book.find(name)
-        if record:
-            record.add_birthday(birthday)
-            return f"Birthday {birthday} added to {name}."
-        else:
-            raise KeyError
+        # Перевірка чи не знаходиться день народження в майбутньому
+        if datetime.strptime(birthday, "%d.%m.%Y") > datetime.now():
+            raise ValueError("New birthday cannot come from the future. Use realistic date.")
+        else:   
+            record = address_book.find(name)
+            if record:
+                record.add_birthday(birthday)
+                return f"Birthday {birthday} added to {name}."
+            else:
+                raise KeyError
     else:
         raise ValueError("Give me name and birthday (DD.MM.YYYY) please.")
 
@@ -538,13 +542,17 @@ def add_birthday_to_contact(args, address_book):
 def edit_birthday_for_contact(args, address_book):
     if len(args) == 2:
         name, new_birthday = args
-        record = address_book.find(name)
-        if record:
-            old_birthday = record.birthday.value if record.birthday else None
-            record.edit_birthday(new_birthday)
-            return f"Birthday for {name} edited. Old birthday {old_birthday} replaced by new birthday: {new_birthday}."
+        # Перевірка чи не знаходиться новий день народження в майбутньому
+        if datetime.strptime(birthday, "%d.%m.%Y") > datetime.now():
+            raise ValueError("New birthday cannot come from the future. Use realistic date.")
         else:
-            raise KeyError
+            record = address_book.find(name)
+            if record:
+                old_birthday = record.birthday.value if record.birthday else None
+                record.edit_birthday(new_birthday)
+                return f"Birthday for {name} edited. Old birthday {old_birthday} replaced by new birthday: {new_birthday}."
+            else:
+                raise KeyError
     else:
         raise ValueError("Give me name and new birthday (DD.MM.YYYY) please.")
     
@@ -568,7 +576,6 @@ def show_birthday(args, address_book):
 days_of_week = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
 
 # Дні народження на наступному тижні
-
 def show_upcoming_birthdays(address_book):
     birthday_next_week = defaultdict(list)
     start_of_year = datetime(year=datetime.now().year, month=1, day=1)
@@ -593,6 +600,31 @@ def show_upcoming_birthdays(address_book):
     for el in sorted(birthday_next_week.items(), key=lambda t: t[0]):
         names_to_congratulate = ', '.join(el[1])
         print(f'{days_of_week[el[0]]}: {names_to_congratulate}')
+
+# Дні народження через задану кількість днів
+def show_upcoming_birthdays_in_days(args, address_book):
+    if len(args) == 1:
+        days = int(args[0])
+        birthdays_soon = defaultdict(list)
+        current_date = datetime.now().date()
+        future_date = current_date + timedelta(days)
+        for record in address_book.data.values():
+            if record.birthday and record.birthday.value:
+                #birthday_date = datetime.strptime(record.birthday.value, "%d.%m.%Y").replace(year=current_date.year).date()
+                birthday_date = datetime.strptime(record.birthday.value, "%d.%m.%Y").date()                
+                if birthday_date.month == future_date.month and birthday_date.day == future_date.day:
+                    # birthdays_soon[birthday_date.weekday()].append(record.name.value)
+                    birthdays_soon[str(birthday_date)].append(record.name.value)
+
+        print(f'\nUpcoming birthdays in the next {days} days:\n')
+
+        for bd, names_to_list in sorted(birthdays_soon.items()):
+            names_to_list_str = ', '.join(names_to_list)
+            print(f'{bd}: {names_to_list_str}')
+
+    else:
+        raise ValueError("Give me the number of days starting from today in which you want to see the birthdays.")
+
 
 ## NOTES 
 # processing user input funtions
@@ -688,7 +720,7 @@ def display_help():
         "Contact": ["add - add new contact", "del - delete contact/number"],
         "Phone": ["add-phone - add phone number to an existing contact", "remove-phone - remove phone number from an existing contact", "edit-phone - edit phone number for an existing contact"],
         "Email": ["add-email - add email to an existing contact", "remove-email - remove email from an existing contact", "edit-email - edit email for an existing contact"],
-        "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", "birthdays - show upcoming birthdays"],
+        "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", 'show-birthdays-in-days - show contacts with birthdays in a number of days specified', "birthdays - show upcoming birthdays"],
         "Address": ["add-address - add address for an existing contact","edit-address - edit address for an existing contact","remove-address - remove address for an existing contact" ],
         "Notes": ["add-note - addin note", "all-notes - display all notes"],
     }
@@ -773,6 +805,8 @@ def main():
             print(show_birthday(args, address_book))
         elif command == "birthdays":
             show_upcoming_birthdays(address_book)
+        elif command == "show-birthdays-in-days":
+            print(show_upcoming_birthdays_in_days(args, address_book))
         elif command == "add-email":                                # EMAIL
             print(add_email_to_contact(args, address_book))
         elif command == "remove-email":
