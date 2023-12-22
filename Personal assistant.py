@@ -234,7 +234,21 @@ class NoteBook:
             
             if note_record.timestamp.noteID == searchID:
                 return note_record
-
+            
+    def find_date_slot(self, start_date = datetime.now() - timedelta(days = 1), end_date = datetime.now()):
+        date_slot_list = []
+        for ts, note_record in self.data.items():
+            if note_record.timestamp.ts >= start_date and note_record.timestamp.ts <= end_date:
+                date_slot_list.append(note_record)
+        return date_slot_list
+    
+    def find_name(self, name):
+        name_note_list = []
+        for ts, note_record in self.data.items():
+            if note_record.note_name == name:
+                name_note_list.append(note_record)
+        return name_note_list
+        
 # Розділення введеного рядка на команду та аргументи
 def parse_input(user_input):
     cmd, *args = user_input.split()
@@ -286,13 +300,14 @@ def load_notes(notebook, filename="notebook.txt"):
     try:
         with open(filename, "r") as file:
             for line in file:
-                timestamp_ts_str, timestamp_ID_str, tags_str, note_str = line.strip().split("_")
+                timestamp_ts_str, timestamp_ID_str, tags_str, note_str, note_name = line.strip().split("_")
                 tags = tags_str.split(", ")
                 note = Note(note_str)
                 time_stamp = Timestamp(int(timestamp_ID_str), datetime.strptime(timestamp_ts_str, '%Y-%m-%d %H:%M:%S.%f'))
                 note_record = NoteRecord(note)
                 note_record.timestamp = time_stamp
                 note_record.tags = tags
+                note_record.note_name = note_name
                 notebook.add_record_notebook(note_record)
 
     except FileNotFoundError:
@@ -556,12 +571,16 @@ def remove_address_from_contact(args, address_book):
 def add_birthday_to_contact(args, address_book):
     if len(args) == 2:
         name, birthday = args
-        record = address_book.find(name)
-        if record:
-            record.add_birthday(birthday)
-            return f"Birthday {birthday} added to {name}."
-        else:
-            raise KeyError
+        # Перевірка чи не знаходиться день народження в майбутньому
+        if datetime.strptime(birthday, "%d.%m.%Y") > datetime.now():
+            raise ValueError("New birthday cannot come from the future. Use realistic date.")
+        else:   
+            record = address_book.find(name)
+            if record:
+                record.add_birthday(birthday)
+                return f"Birthday {birthday} added to {name}."
+            else:
+                raise KeyError
     else:
         raise ValueError("Give me name and birthday (DD.MM.YYYY) please.")
 
@@ -571,13 +590,17 @@ def add_birthday_to_contact(args, address_book):
 def edit_birthday_for_contact(args, address_book):
     if len(args) == 2:
         name, new_birthday = args
-        record = address_book.find(name)
-        if record:
-            old_birthday = record.birthday.value if record.birthday else None
-            record.edit_birthday(new_birthday)
-            return f"Birthday for {name} edited. Old birthday {old_birthday} replaced by new birthday: {new_birthday}."
+        # Перевірка чи не знаходиться новий день народження в майбутньому
+        if datetime.strptime(birthday, "%d.%m.%Y") > datetime.now():
+            raise ValueError("New birthday cannot come from the future. Use realistic date.")
         else:
-            raise KeyError
+            record = address_book.find(name)
+            if record:
+                old_birthday = record.birthday.value if record.birthday else None
+                record.edit_birthday(new_birthday)
+                return f"Birthday for {name} edited. Old birthday {old_birthday} replaced by new birthday: {new_birthday}."
+            else:
+                raise KeyError
     else:
         raise ValueError("Give me name and new birthday (DD.MM.YYYY) please.")
     
@@ -601,7 +624,6 @@ def show_birthday(args, address_book):
 days_of_week = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
 
 # Дні народження на наступному тижні
-
 def show_upcoming_birthdays(address_book):
     birthday_next_week = defaultdict(list)
     start_of_year = datetime(year=datetime.now().year, month=1, day=1)
@@ -626,6 +648,31 @@ def show_upcoming_birthdays(address_book):
     for el in sorted(birthday_next_week.items(), key=lambda t: t[0]):
         names_to_congratulate = ', '.join(el[1])
         print(f'{days_of_week[el[0]]}: {names_to_congratulate}')
+
+# Дні народження через задану кількість днів
+def show_upcoming_birthdays_in_days(args, address_book):
+    if len(args) == 1:
+        days = int(args[0])
+        birthdays_soon = defaultdict(list)
+        current_date = datetime.now().date()
+        future_date = current_date + timedelta(days)
+        for record in address_book.data.values():
+            if record.birthday and record.birthday.value:
+                #birthday_date = datetime.strptime(record.birthday.value, "%d.%m.%Y").replace(year=current_date.year).date()
+                birthday_date = datetime.strptime(record.birthday.value, "%d.%m.%Y").date()                
+                if birthday_date.month == future_date.month and birthday_date.day == future_date.day:
+                    # birthdays_soon[birthday_date.weekday()].append(record.name.value)
+                    birthdays_soon[str(birthday_date)].append(record.name.value)
+
+        print(f'\nUpcoming birthdays in the next {days} days:\n')
+
+        for bd, names_to_list in sorted(birthdays_soon.items()):
+            names_to_list_str = ', '.join(names_to_list)
+            print(f'{bd}: {names_to_list_str}')
+
+    else:
+        raise ValueError("Give me the number of days starting from today in which you want to see the birthdays.")
+
 
 ## NOTES 
 # processing user input funtions
@@ -693,8 +740,24 @@ def edit_note(args, notebook):
 def note_delete(args, notebook):
     # Запит ID нотатки
     note_ID = int(input("Enter Note ID: "))
-    
     print(f'Note deleted:\n {notebook.delete(note_ID)}')
+
+def find_note_date(args, notebook):
+    # Запит ітервалу дат створення нотаток
+    start = input("Enter start date: ")
+    end = input("Enter end date: ")
+    start_date = datetime.strptime(start, '%Y-%m-%d')
+    end_date = datetime.strptime(end, '%Y-%m-%d')
+    print(f'Notes created from {start_date} to {end_date}:\n')
+    for note in notebook.find_date_slot(start_date, end_date):
+        print(note)
+
+def find_note_name(args, notebook):
+    # Запит ітервалу дат створення нотаток
+    search_name = input("Enter searched name: ")
+    print(f'Notes with name {search_name}:\n')
+    for note in notebook.find_name(search_name):
+        print(note)
 
 ## DATABASE
 # Збереження контактів у текстовий файл  
@@ -738,7 +801,7 @@ def save_notes(notebook, filename="notebook.txt"):
     with open(filename, "w") as file:
         for noterecord in notebook.data.values():
             tags_str = ', '.join(map(str, noterecord.tags)) if noterecord.tags else ""
-            file.write(f"{noterecord.timestamp.ts}_{noterecord.timestamp.noteID}_{tags_str}_{noterecord.note}\n")
+            file.write(f"{noterecord.timestamp.ts}_{noterecord.timestamp.noteID}_{tags_str}_{noterecord.note}_{noterecord.note_name}\n")
 
 ## POPUP
 # Меню Help
@@ -762,9 +825,9 @@ def display_help():
         "Contact": ["add - add new contact", "del - delete contact/number"],
         "Phone": ["add-phone - add phone number to an existing contact", "remove-phone - remove phone number from an existing contact", "edit-phone - edit phone number for an existing contact"],
         "Email": ["add-email - add email to an existing contact", "remove-email - remove email from an existing contact", "edit-email - edit email for an existing contact"],
-        "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", "birthdays - show upcoming birthdays"],
+        "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", 'show-birthdays-in-days - show contacts with birthdays in a number of days specified', "birthdays - show upcoming birthdays"],
         "Address": ["add-address - add address for an existing contact","edit-address - edit address for an existing contact","remove-address - remove address for an existing contact" ],
-        "Notes": ["add-note - adding note", "edit-note - editing note", "find-note-ID - find note by given ID", "all-notes - display all notes"],
+        "Notes": ["add-note - adding note", "edit-note - editing note", "find-note-ID - find note by given ID", "find-note-name - find notes for a given name", "find-note-date - find notes for a given date slot (format of input: start date 2023-12-21 end date 2023-12-22)", "all-notes - display all notes", "note-del - delete note for a given note ID"],
     }
 
     for category, commands in categories.items():
@@ -847,6 +910,8 @@ def main():
             print(show_birthday(args, address_book))
         elif command == "birthdays":
             show_upcoming_birthdays(address_book)
+        elif command == "show-birthdays-in-days":
+            print(show_upcoming_birthdays_in_days(args, address_book))
         elif command == "add-email":                                # EMAIL
             print(add_email_to_contact(args, address_book))
         elif command == "remove-email":
@@ -870,7 +935,11 @@ def main():
         elif command == "edit-note":
             print(edit_note(args, notebook))
         elif command == "note-del":                           
-            note_delete(args, notebook)                
+            note_delete(args, notebook)
+        elif command == "find-note-date":                           
+            find_note_date(args, notebook)
+        elif command == "find-note-name":                           
+            find_note_name(args, notebook)                 
         else:
             print("Invalid command.")
 
