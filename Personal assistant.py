@@ -207,9 +207,9 @@ class NoteBook:
     def add_record_notebook(self, note_record):
         self.data[note_record.timestamp.ts] = note_record
 
-    def show_all_notes(self):
-        for note_record in self.data.values():
-            print(note_record)
+    #def show_all_notes(self):
+        #for note_record in self.data.values():
+            #print(note_record)
     
     def find_note_day(self, day):
         notes_list_day = []
@@ -322,6 +322,35 @@ def list_contacts(address_book):
 
     return ""
 
+@input_error
+def show_all_notes(notebook):
+    console = Console()
+
+    if not notebook.data:
+        console.print("No notes found.")
+    else:
+        # Create a table with appropriate columns
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("ID", style="dim", width=12)
+        table.add_column("Timestamp", justify="left")
+        table.add_column("Note Name", justify="left")
+        table.add_column("Note Text", justify="left")
+        table.add_column("Tags", justify="left")
+        
+
+        # Populate the table with notes
+        for timestamp, note_record in notebook.data.items():
+            tags_str = ', '.join([str(tag) for tag in note_record.tags])
+            table.add_row(
+                str(note_record.timestamp.noteID),
+                str(note_record.timestamp.ts),
+                str(note_record.note_name),
+                tags_str,
+                str(note_record.note)
+            )
+
+        # Print the table to the console
+        console.print(table)
 
 ## CONTACT
 # Додавання контакту
@@ -835,7 +864,7 @@ def main():
         elif command == "add-note":                           # NOTES 
             print(add_record_notebook(args, notebook))
         elif command == "all-notes":                         
-            notebook.show_all_notes()                          
+            show_all_notes(notebook)                          
         elif command == "find-note-id":                         
             print(find_note_ID(args, notebook))                  
         elif command == "edit-note":
