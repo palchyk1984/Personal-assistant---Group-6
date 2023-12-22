@@ -234,7 +234,21 @@ class NoteBook:
             
             if note_record.timestamp.noteID == searchID:
                 return note_record
-
+            
+    def find_date_slot(self, start_date = datetime.now() - timedelta(days = 1), end_date = datetime.now()):
+        date_slot_list = []
+        for ts, note_record in self.data.items():
+            if note_record.timestamp.ts >= start_date and note_record.timestamp.ts <= end_date:
+                date_slot_list.append(note_record)
+        return date_slot_list
+    
+    def find_name(self, name):
+        name_note_list = []
+        for ts, note_record in self.data.items():
+            if note_record.note_name == name:
+                name_note_list.append(note_record)
+        return name_note_list
+        
 # Розділення введеного рядка на команду та аргументи
 def parse_input(user_input):
     cmd, *args = user_input.split()
@@ -286,13 +300,14 @@ def load_notes(notebook, filename="notebook.txt"):
     try:
         with open(filename, "r") as file:
             for line in file:
-                timestamp_ts_str, timestamp_ID_str, tags_str, note_str = line.strip().split("_")
+                timestamp_ts_str, timestamp_ID_str, tags_str, note_str, note_name = line.strip().split("_")
                 tags = tags_str.split(", ")
                 note = Note(note_str)
                 time_stamp = Timestamp(int(timestamp_ID_str), datetime.strptime(timestamp_ts_str, '%Y-%m-%d %H:%M:%S.%f'))
                 note_record = NoteRecord(note)
                 note_record.timestamp = time_stamp
                 note_record.tags = tags
+                note_record.note_name = note_name
                 notebook.add_record_notebook(note_record)
 
     except FileNotFoundError:
@@ -664,8 +679,24 @@ def edit_note(args, notebook):
 def note_delete(args, notebook):
     # Запит ID нотатки
     note_ID = int(input("Enter Note ID: "))
-    
     print(f'Note deleted:\n {notebook.delete(note_ID)}')
+
+def find_note_date(args, notebook):
+    # Запит ітервалу дат створення нотаток
+    start = input("Enter start date: ")
+    end = input("Enter end date: ")
+    start_date = datetime.strptime(start, '%Y-%m-%d')
+    end_date = datetime.strptime(end, '%Y-%m-%d')
+    print(f'Notes created from {start_date} to {end_date}:\n')
+    for note in notebook.find_date_slot(start_date, end_date):
+        print(note)
+
+def find_note_name(args, notebook):
+    # Запит ітервалу дат створення нотаток
+    search_name = input("Enter searched name: ")
+    print(f'Notes with name {search_name}:\n')
+    for note in notebook.find_name(search_name):
+        print(note)
 
 ## DATABASE
 # Збереження контактів у текстовий файл  
@@ -709,7 +740,7 @@ def save_notes(notebook, filename="notebook.txt"):
     with open(filename, "w") as file:
         for noterecord in notebook.data.values():
             tags_str = ', '.join(map(str, noterecord.tags)) if noterecord.tags else ""
-            file.write(f"{noterecord.timestamp.ts}_{noterecord.timestamp.noteID}_{tags_str}_{noterecord.note}\n")
+            file.write(f"{noterecord.timestamp.ts}_{noterecord.timestamp.noteID}_{tags_str}_{noterecord.note}_{noterecord.note_name}\n")
 
 ## POPUP
 # Меню Help
@@ -735,7 +766,7 @@ def display_help():
         "Email": ["add-email - add email to an existing contact", "remove-email - remove email from an existing contact", "edit-email - edit email for an existing contact"],
         "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", "birthdays - show upcoming birthdays"],
         "Address": ["add-address - add address for an existing contact","edit-address - edit address for an existing contact","remove-address - remove address for an existing contact" ],
-        "Notes": ["add-note - adding note", "edit-note - editing note", "find-note-ID - find note by given ID", "all-notes - display all notes"],
+        "Notes": ["add-note - adding note", "edit-note - editing note", "find-note-ID - find note by given ID", "find-note-name - find notes for a given name", "find-note-date - find notes for a given date slot (format of input: start date 2023-12-21 end date 2023-12-22)", "all-notes - display all notes", "note-del - delete note for a given note ID"],
     }
 
     for category, commands in categories.items():
@@ -841,7 +872,11 @@ def main():
         elif command == "edit-note":
             print(edit_note(args, notebook))
         elif command == "note-del":                           
-            note_delete(args, notebook)                
+            note_delete(args, notebook)
+        elif command == "find-note-date":                           
+            find_note_date(args, notebook)
+        elif command == "find-note-name":                           
+            find_note_name(args, notebook)                 
         else:
             print("Invalid command.")
 
