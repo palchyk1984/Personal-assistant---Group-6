@@ -61,6 +61,9 @@ For correct work of this application before launching a code you have to install
 `new note` - add a new note <br> 
 `Add tag` - add a tag to an existing note <br> 
 `Edit note` - edit note description <br> 
+'find-note-name' - find notes for a given name <br>
+'find-note-date' - find notes for a given date slot (format of input: start date 2023-12-21 end date 2023-12-22) <br>
+'note-del' - delete note for a given note ID <br>
 
 ## Additional Features Implemented:
 * Smart console suggesting

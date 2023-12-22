@@ -1,1 +1,1 @@
-global noteID
+"note-del - delete note for a given note ID"
