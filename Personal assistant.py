@@ -1,4 +1,5 @@
 import re
+import random 
 from datetime import datetime, timedelta
 from collections import defaultdict
 from rich.console import Console
@@ -7,6 +8,7 @@ from rich.table import Table
 from rich.panel import Panel
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
+from quotes import quotes_list
 
 console = Console()
 
@@ -221,7 +223,16 @@ class NoteBook:
 
     def get_maxID(self):
         return self.data[-1].noteID
-
+    
+    
+    #def sort_notes_by_tags(self, reverse=False):
+    
+    def sort_notes_by_name(self, reverse=False):
+        sorted_notes_name = sorted(self.data.values(), key = lambda note: note.note_name.lower(), reverse=reverse)   
+        for note in sorted_notes_name:
+            print(note)
+            
+            
 # Розділення введеного рядка на команду та аргументи
 def parse_input(user_input):
     cmd, *args = user_input.split()
@@ -273,6 +284,7 @@ def load_notes(notebook, filename="notebook.txt"):
     try:
         with open(filename, "r") as file:
             for line in file:
+                print(f"Loading line: {line}") 
                 timestamp_ts_str, timestamp_ID_str, tags_str, note_str = line.strip().split("_")
                 tags = tags_str.split(", ")
                 note = Note(note_str)
@@ -283,7 +295,7 @@ def load_notes(notebook, filename="notebook.txt"):
                 notebook.add_record_notebook(note_record)
 
     except FileNotFoundError:
-        pass
+        print("File not found, starting with an empty notebook")
 
 ## VIEW All Contacts
 @input_error
@@ -533,11 +545,11 @@ def edit_birthday_for_contact(args, address_book):
         if record:
             old_birthday = record.birthday.value if record.birthday else None
             record.edit_birthday(new_birthday)
-            return f"Birthday for {name} edited. Old birthday {old_birthday} replaced by new birthday: {new_birthday}."
+            return f"Birthday for {name} edited. Old birthday {old_birthday} replaced by the new birthday: {new_birthday}."
         else:
             raise KeyError
     else:
-        raise ValueError("Give me name and new birthday (DD.MM.YYYY) please.")
+        raise ValueError("Give me the name and a new birthday (DD.MM.YYYY) please.")
     
 # Показ дня народження контакту
     
@@ -553,7 +565,7 @@ def show_birthday(args, address_book):
         else:
             raise KeyError
     else:
-        raise ValueError("Give me a name to show birthday.")
+        raise ValueError("Give me a name to show a birthday.")
 
 # Оголошення списку днів тижня
 days_of_week = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
@@ -621,18 +633,18 @@ def save_contacts(address_book, filename="contacts.txt"):
             addresses_str = ';'.join(map(str, record.addresses))  # Додайте це
             file.write(f"{record.name.value}:{phones_str}:{emails_str}:{addresses_str}:{birthday_str}\n")
 
-## Baby youda
+## Baby yoda
 def get_valid_commands():
     address_book = AddressBook()
     commands = [
-        "close", "exit", "hello", "help", 
+        "close", "exit", "hello", "help", "quote",
         "add", "del",
         "all", "find",
         "add-phone", "remove-phone", "edit-phone", "find-phone",
         "add-birthday", "edit-birthday", "show-birthday", "birthdays",
         "add-email","remove-email", "edit-email", 
         "add-address", "edit-address" ,"remove-address",
-        "add-note", "all-notes"
+        "add-note", "all-notes", "sort-notes-az", "sort-notes-za",
     ]
 
     # Add dynamically generated commands based on the address book data
@@ -646,11 +658,19 @@ def get_user_input():
 
 # Збереження ноутів у текстовий файл  
 @input_error
+@input_error
 def save_notes(notebook, filename="notebook.txt"):
     with open(filename, "w") as file:
         for noterecord in notebook.data.values():
             tags_str = ', '.join(map(str, noterecord.tags)) if noterecord.tags else ""
             file.write(f"{noterecord.timestamp.ts}_{noterecord.timestamp.noteID}_{tags_str}_{noterecord.note}\n")
+
+
+##Random quote
+def random_quote():
+    return random.choice(quotes_list)
+
+
 
 ## POPUP
 # Меню Help
@@ -669,14 +689,14 @@ def display_help():
 
     # Виведення категорій та команд для кожної категорії
     categories = {
-        "Main commands": ["hello - greeting message", "help - display all commands from the menu", "close/exit - save added contacts/notes and finish work"],
+        "Main commands": ["hello - greeting message", "help - display all commands from the menu", "quote - print a random Star Wars quote", "close/exit - save added contacts/notes and finish the work"],
         "Search": ["all - show all contacts", "find - number search by name", "find-phone - search contacts by phone number"],
-        "Contact": ["add - add new contact", "del - delete contact/number"],
-        "Phone": ["add-phone - add phone number to an existing contact", "remove-phone - remove phone number from an existing contact", "edit-phone - edit phone number for an existing contact"],
-        "Email": ["add-email - add email to an existing contact", "remove-email - remove email from an existing contact", "edit-email - edit email for an existing contact"],
-        "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", "birthdays - show upcoming birthdays"],
-        "Address": ["add-address - add address for an existing contact","edit-address - edit address for an existing contact","remove-address - remove address for an existing contact" ],
-        "Notes": ["add-note - addin note", "all-notes - display all notes"],
+        "Contact": ["add - add a new contact", "del - delete contact/number"],
+        "Phone": ["add-phone - add a phone number to an existing contact", "remove-phone - remove the phone number from an existing contact", "edit-phone - edit phone number for an existing contact"],
+        "Email": ["add-email - add an email to an existing contact", "remove-email - remove an email from an existing contact", "edit-email - edit email for an existing contact"],
+        "Birthday": ["add-birthday - add a birthday to an existing contact", "edit-birthday - edit the birthday of an existing contact", "show-birthday - show the birthday of a contact", "birthdays - show upcoming birthdays"],
+        "Address": ["add-address - add the address for an existing contact","edit-address - edit the address for an existing contact","remove-address - remove the address for an existing contact" ],
+        "Notes": ["add-note - add a new note", "all-notes - display all notes", "sort-notes-az - sort notes by name a-z", "sort-notes-za - sort notes by name z-a"],
     }
 
     for category, commands in categories.items():
@@ -694,28 +714,28 @@ def main():
     noteID = notebook.get_maxID
     display_help() 
     
-    #print("Greeting you, my young padawan!")
+    #print("Greetings to you, my young padawan!")
     baby_yoda_ascii_art = """
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠀⠀⠀⠀⠀⠀⢀⣠⡴⠖⣛⣋⣭⣭⣭⣍⣙⡓⠶⢤⣀⠀⠀⠀⠀⠀⠀⠀
     ⠀⠀⠀⠀⢀⡴⢋⣥⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣍⡳⣦⡀⠀⠀⠀⠀
     ⠀⠀⢀⡴⢋⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠻⣄⠀⠀⠀
     ⠀⠀⠞⣱⣿⣿⣿⣿⣿⣿⠿⠟⠛⢉⠙⠛⠻⢿⣿⣿⣿⣿⣿⣷⡘⣧⠀⠀
-    ⠀⢲⣤⣤⣀⡉⠉⠙⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠛⠛⠛⠛⠓⠚⠓⡀
-    ⢰⡇⠻⣿⣿⣿⣷⡀⠀⡠⣤⣀⠀⠀⠀ ⠀⡈⢬⣀⠀⢠⣶⣿⣿⣿⣿⢏⠀
+    ⠀⢲⣤⣤⣀⡉⠉⠙⠉⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠈⠙⠛⠛⠛⠛⠓⠚⠓⡀
+    ⢰⡇⠻⣿⣿⣿⣷⡀⠀⡠⣤⣀⠀⠀⠀ ⡈⢬⣀⠀ ⣶⣿⣿⣿⣿⢏⠀
     ⢸⡇⣷⣌⡛⠛⠻⠇⠈⠻⠿⠿⠂⠄⠄⠸⠿⠿⠛⠀⠸⠿⠿⠿⣛⡕⢹⠀
     ⠸⡇⣿⣿⣿⣿⣷⣶⣄⣀⣀⣀⣀⣀⣀⣀⣠⣄⣠⣤⣶⣶⣿⣿⣿⡇⣼⠀
-    ⠀⢷⠸⣿⣿⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣿⠿⢻⡟⠁⢀⣻⣿⣿⢡⡇⠀
-    ⠀⠈⢧⡹⣿⣿⣿⣷⡀⠀⠉⠿⡿⠛⠋⠁⠀ ⠀⣿⣷⣶⣾⣿⡿⢡⡟⠀⠀
-    ⠀⠀⠈⠳⣌⠿⣿⣈⣙⠇⠀⠈⡁⠀⠀⠀⠀ ⠀⢻⣿⣿⣿⠟⣵⠏⠀⠀⠀
-    ⠀⠀⠀⠀⠙⠳⣌⡛⢿⡀⠀⢀⠀⠀⠀⠀ ⠀⠀⣸⠿⢋⡵⠞⠁⠀⠀⠀⠀
+    ⠀⢷⠸⣿⣿⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣿⠿⢻⡟⠁ ⣻⣿⣿⢡⡇⠀
+    ⠀⠈⢧⡹⣿⣿⣿⣷⡀⠀⠉⠿⡿⠛⠋⠁⠀ ⣿⣷⣶⣾⣿⡿⢡⡟⠀⠀
+    ⠀⠀⠈⠳⣌⠿⣿⣈⣙⠇⠀⠈⡁⠀⠀⠀⠀ ⢻⣿⣿⣿⠟⣵⠏⠀⠀⠀
+    ⠀⠀⠀⠀⠙⠳⣌⡛⢿⡀⠀⢀⠀⠀⠀⠀ ⠀⣸⠿⢋⡵⠞⠁⠀⠀⠀⠀
     ⠀⠀⠀⠀⠀⠀⠈⠙⠲⠦⣭⣘⣒⣒⣒⣒⣨⡭⠴⠚⠉⠀⠀⠀⠀⠀⠀⠀
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀  ⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     """
     style = "bold green"
     console.print(baby_yoda_ascii_art, style=style)
 
-    panel = Panel.fit("Greeting you, my young padawan!", title="My name is baby youda :)", border_style="green")
+    panel = Panel.fit("Greetings to you, my young padawan!:)", title="Baby Yoda:", border_style="green")
     console.print(panel)    
     
     
@@ -731,7 +751,7 @@ def main():
         if command in ["close", "exit"]:
             save_contacts(address_book)
             save_notes(notebook)
-            print("Goodbye!")
+            print("May the force be with you!")
             break
         elif command == "hello":
             print("How can I help you?")
@@ -773,10 +793,16 @@ def main():
             print(remove_address_from_contact(args, address_book))
         elif command == 'help':
             display_help()
-        elif command == "add-note":                           # NOTES specific command
+        elif command == "add-note":                                 # NOTES specific command
             print(add_record_notebook(args, notebook))
         elif command == "all-notes":                         
-            notebook.show_all_notes()                          # NOTES specific command
+            notebook.show_all_notes()                               # NOTES specific command
+        elif command == "quote": 
+            console.print(Panel.fit(random_quote(), border_style="green"))   # команда "quote" для виведення випадкової SW цитати
+        elif command == "sort-notes-az":                            # сотрування нотатокза іменем A-Z
+            notebook.sort_notes_by_name(reverse=False)
+        elif command == "sort-notes-za":                            # сотрування нотатокза іменем Z-A
+            notebook.sort_notes_by_name(reverse=True)    
         else:
             print("Invalid command.")
 
