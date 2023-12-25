@@ -694,7 +694,7 @@ def add_record_notebook(args, notebook):
     
     notebook.add_record_notebook(note_record)
     
-    return 'Note added to the notebook'
+    return f'Note with ID: {noteID} added to the notebook'
 @input_error
 def find_note_ID(args, notebook):
     # Запит ID нотатки
@@ -736,12 +736,14 @@ def edit_note(args, notebook):
         return f"Note ID {note_id} edited successfully."
     else:
         raise ValueError(f"No note found with ID {note_id}.")
-
+    
+@input_error
 def note_delete(args, notebook):
     # Запит ID нотатки
     note_ID = int(input("Enter Note ID: "))
     print(f'Note deleted:\n {notebook.delete(note_ID)}')
 
+@input_error
 def find_note_date(args, notebook):
     # Запит ітервалу дат створення нотаток
     start = input("Enter start date: ")
@@ -751,9 +753,10 @@ def find_note_date(args, notebook):
     print(f'Notes created from {start_date} to {end_date}:\n')
     for note in notebook.find_date_slot(start_date, end_date):
         print(note)
-
+        
+@input_error
 def find_note_name(args, notebook):
-    # Запит ітервалу дат створення нотаток
+    # Запит назви нотатоки
     search_name = input("Enter searched name: ")
     print(f'Notes with name {search_name}:\n')
     for note in notebook.find_name(search_name):
