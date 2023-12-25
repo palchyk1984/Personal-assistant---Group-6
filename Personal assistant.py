@@ -591,7 +591,7 @@ def edit_birthday_for_contact(args, address_book):
     if len(args) == 2:
         name, new_birthday = args
         # Перевірка чи не знаходиться новий день народження в майбутньому
-        if datetime.strptime(birthday, "%d.%m.%Y") > datetime.now():
+        if datetime.strptime(new_birthday, "%d.%m.%Y") > datetime.now():
             raise ValueError("New birthday cannot come from the future. Use realistic date.")
         else:
             record = address_book.find(name)
@@ -786,7 +786,7 @@ def get_valid_commands():
         "add-birthday", "edit-birthday", "show-birthday", "birthdays",
         "add-email","remove-email", "edit-email", 
         "add-address", "edit-address" ,"remove-address",
-        "add-note", "all-notes", "edit-note", "find-note-ID"
+        "add-note", "all-notes", "edit-note", "find-note-ID","find-note-name", "find-note-date", "note-del"
     ]
 
     # Add dynamically generated commands based on the address book data
