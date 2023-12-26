@@ -1,4 +1,5 @@
 import re
+import random 
 from datetime import datetime, timedelta
 from collections import defaultdict
 from rich.console import Console
@@ -7,6 +8,7 @@ from rich.table import Table
 from rich.panel import Panel
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
+#from quotes import quotes_list
 
 console = Console()
 
@@ -207,10 +209,6 @@ class NoteBook:
     def add_record_notebook(self, note_record):
         self.data[note_record.timestamp.ts] = note_record
 
-    #def show_all_notes(self):
-        #for note_record in self.data.values():
-            #print(note_record)
-    
     def find_note_day(self, day):
         notes_list_day = []
         for timesnap in self.data:
@@ -225,6 +223,11 @@ class NoteBook:
                 ts_to_delete = ts
 
         return self.data.pop(ts_to_delete)
+    
+    def sort_notes_by_name(self, reverse=False):
+        sorted_notes_name = sorted(self.data.values(), key = lambda note: note.note_name.lower(), reverse=reverse)   
+        for note in sorted_notes_name:
+            print(note)
 
     def get_maxID(self):
         return self.data[-1].noteID
@@ -786,7 +789,7 @@ def get_valid_commands():
         "add-birthday", "edit-birthday", "show-birthday", "birthdays",
         "add-email","remove-email", "edit-email", 
         "add-address", "edit-address" ,"remove-address",
-        "add-note", "all-notes", "edit-note", "find-note-ID","find-note-name", "find-note-date", "note-del"
+        "add-note", "all-notes", "edit-note", "find-note-ID","find-note-name", "find-note-date", "note-del", "sort-notes-az", "sort-notes-za",
     ]
 
     # Add dynamically generated commands based on the address book data
@@ -830,7 +833,7 @@ def display_help():
         "Email": ["add-email - add email to an existing contact", "remove-email - remove email from an existing contact", "edit-email - edit email for an existing contact"],
         "Birthday": ["add-birthday - add birthday to an existing contact", "edit-birthday - edit birthday of an existing contact", "show-birthday - show birthday of a contact", 'show-birthdays-in-days - show contacts with birthdays in a number of days specified', "birthdays - show upcoming birthdays"],
         "Address": ["add-address - add address for an existing contact","edit-address - edit address for an existing contact","remove-address - remove address for an existing contact" ],
-        "Notes": ["add-note - adding note", "edit-note - editing note", "find-note-ID - find note by given ID", "find-note-name - find notes for a given name", "find-note-date - find notes for a given date slot (format of input: start date 2023-12-21 end date 2023-12-22)", "all-notes - display all notes", "note-del - delete note for a given note ID"],
+        "Notes": ["add-note - adding note", "edit-note - editing note", "find-note-ID - find note by given ID", "find-note-name - find notes for a given name", "find-note-date - find notes for a given date slot (format of input: start date 2023-12-21 end date 2023-12-22)", "all-notes - display all notes", "note-del - delete note for a given note ID", "sort-notes-az - sort notes by name a-z", "sort-notes-za - sort notes by name z-a"],
     }
 
     for category, commands in categories.items():
@@ -942,7 +945,13 @@ def main():
         elif command == "find-note-date":                           
             find_note_date(args, notebook)
         elif command == "find-note-name":                           
-            find_note_name(args, notebook)                 
+            find_note_name(args, notebook)  
+        #elif command == "quote": 
+           # console.print(Panel.fit(random_quote(), border_style="green"))   # команда "quote" для виведення випадкової SW цитати
+        elif command == "sort-notes-az":                            # сотрування нотатокза іменем A-Z
+            notebook.sort_notes_by_name(reverse=False)
+        elif command == "sort-notes-za":                            # сотрування нотатокза іменем Z-A
+            notebook.sort_notes_by_name(reverse=True)                
         else:
             print("Invalid command.")
 
